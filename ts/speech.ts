@@ -101,7 +101,17 @@ export class Speech {
     }
     
     onMark(ev: SpeechSynthesisEvent) : void {
+    }
 
+    async waitEnd() : Promise<void> {
+        return new Promise((resolve) => {
+            const id = setInterval(()=>{
+                if(! this.speaking){
+                    clearInterval(id);
+                    resolve();
+                }
+            }, 10);
+        });
     }
 }
 

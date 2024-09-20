@@ -19,6 +19,8 @@ const isLetterOrAt = parser_ts.isLetterOrAt;
 
 const parseMath = parser_ts.parseMath;
 
+const View = plane_ts.View;
+
 namespace movie_ts {
 //
 function symbol2words(symbol: string) : string {
@@ -642,7 +644,37 @@ export async function startMovie(){
             throw new MyError();
         }
     }
+}
 
+
+
+export async function play() {
+    const speech = new Speech();
+    for(const shape of View.current.shapes){
+        const text = shape.reading().toString().trim();        
+
+        msg(`reading:${shape.constructor.name} ${text}`);
+        if(text != ""){
+            speech.speak(text);
+        }
+
+        shape.dependencies().forEach(x => {x.select(); x.isOver = true; });
+        View.current.dirty = true;
+        await sleep(1000);
+
+        shape.select();
+        shape.isOver = true;
+        View.current.dirty = true;
+
+        await speech.waitEnd();
+
+        shape.dependencies().forEach(x => {x.unselect(); x.isOver = false;});
+
+        shape.unselect();
+        shape.isOver = false;
+        View.current.dirty = true;
+    }
+    
 }
 
 }
