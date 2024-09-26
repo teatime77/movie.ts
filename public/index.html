@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>Movie</title>
+
+<!------------------------------------ firebase start -------------------------------------->
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/10.13.2/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/10.13.2/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/10.13.2/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/10.13.2/firebase-analytics-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=false"></script>
+<!------------------------------------ firebase end   -------------------------------------->
+
+<!------------------------------------ katex start   -------------------------------------->
+    <link rel="stylesheet" href="../katex/katex.min.css"
+    integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="../katex/katex.min.js"
+    integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx"
+    crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="../katex/contrib/auto-render.min.js"
+    integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+<!------------------------------------ katex end   -------------------------------------->
+
+<script type="text/javascript" src="lib/parser/js/parser.js"></script>
+<script type="text/javascript" src="lib/plane/js/plane.js"></script>
+<script type="text/javascript" src="lib/firebase/js/firebase.js?ver=1"></script>
+<script type="text/javascript" src="lib/movie/js/movie.js"></script>
+
+
+<style type="text/css">
+.main {
+    display: grid; 
+    grid-template-columns: 100px 2px 1fr 2px 300px; 
+    grid-template-rows: 30px 2px 1fr 2px; 
+    background-color:brown; 
+    height: 100%;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="main-grid" class="main">
+    <div id="menu-bar" style="grid-row: 1; grid-column: 1 / 6; background-color: white; "></div>
+    <div id="shape-tool" style="grid-row: 3; grid-column: 1; height: 100%; background-color: white;"></div>
+    <div id="canvas-div" style="grid-row: 3; grid-column: 3; " ></div>
+    <div id="property-div" style="grid-row: 3; grid-column: 5;"></div>
+</div>
+    
+<button id="movie-play" >Play</button>
+
+<button id="movie-start" >Start</button>
+
+<button id="movie-show-firebase" >firebase</button>
+
+<textarea id="sample" cols="160" rows="10">
+diff(f(x) + g(x), x) == diff(f(x), x) + diff(g(x), x)
+
+diff(f(x) + g(x), x) == lim((f(x + Delta) + g(x + Delta) - (f(x) + g(x))) / Delta, Delta, 0)
+
+diff(f(x) + g(x), x) == lim((f(x + Delta) - f(x)) / Delta, Delta, 0) + lim((g(x + Delta) - g(x)) / Delta, Delta, 0)
+</textarea>
+
+<div id="katex-div" style="display: none; width: 1280px;; height: 670px; overflow-y: scroll;" ></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', movie_ts.bodyOnLoad );
+</script>
+    
+</body>
+</html>

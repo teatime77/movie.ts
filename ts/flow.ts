@@ -618,15 +618,6 @@ function addTexDiv(){
     return div;
 }
 
-export async function bodyOnLoad(){
-    plane_ts.initPlane($div("menu-bar"), $div("shape-tool"), $div("canvas-div"), $div("property-div"));
-    
-    await includeDialog();
-    // $dlg("speech-dlg").show();
-
-    await asyncInitSpeech();
-}
-
 export async function startMovie(){
 
     const texts = ($("sample") as HTMLTextAreaElement).value.replace("\r\n", "\n").split("\n").map(x => x.trim()).filter(x => x != "");

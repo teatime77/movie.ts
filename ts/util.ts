@@ -94,9 +94,12 @@ export async function fetchText(fileURL: string) {
     return text;
 }
 
-export async function includeDialog(){
-    const dialog_html = await fetchText("./dialog.html");
-    $div("dlg-list").innerHTML = dialog_html;
+export async function includeDialog(url : string){
+    const dialog_html = await fetchText(url);
+
+    const div = document.createElement("div");
+    div.innerHTML = dialog_html;
+    document.body.append(div);
 }
 
 
