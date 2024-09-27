@@ -1,9 +1,8 @@
-public/js
 public/katex
 .vscode/settings.json
 ts/@types
 public/lib/firebase
 public/lib/parser
 public/lib/plane
-public/lib/movie/js
+public/lib/movie
 install.bat
