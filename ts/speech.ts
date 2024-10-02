@@ -1,6 +1,8 @@
 namespace movie_ts{
 export let speechOn = true;
 
+export let theSpeech : Speech;
+
 let uttrVoice : SpeechSynthesisVoice |  undefined;
 
 let voiceLangSelect : HTMLSelectElement;
@@ -262,6 +264,7 @@ export async function asyncInitSpeech() : Promise<void> {
     return new Promise((resolve) => {
         speechSynthesis.addEventListener("voiceschanged", (ev:Event)=>{
             setVoiceList();
+            theSpeech = new Speech();
             msg("speech initialized");
             resolve();
         })

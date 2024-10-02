@@ -12,8 +12,8 @@ export async function bodyOnLoad(){
 
     firebase_ts.initFirebase();
 
-    $("movie-play").addEventListener("click", (ev : MouseEvent)=>{
-        play();
+    $("movie-play").addEventListener("click", async (ev : MouseEvent)=>{
+        await play();
     })
 
     $("movie-start").addEventListener("click", (ev : MouseEvent)=>{

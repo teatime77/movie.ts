@@ -596,15 +596,14 @@ function *showFlow(root : App, div : HTMLDivElement){
 
     const text = makeTextFromPhrases(phrases);
 
-    let speech = new Speech();
-    speech.speak(text);
+    theSpeech.speak(text);
 
-    for(const s of node.genTex(speech)){
+    for(const s of node.genTex(theSpeech)){
         renderKatexSub(div, s);
         yield;
     }
 
-    while(speech != null && speech.speaking){
+    while(theSpeech != null && theSpeech.speaking){
         yield;
     }
 }
@@ -649,21 +648,22 @@ export async function play() {
             speech.speak(text);
         }
 
-        shape.dependencies().forEach(x => {x.select(); x.isOver = true; });
-        View.current.dirty = true;
-        await sleep(1000);
+        for(const dep of shape.dependencies()){
+            dep.select();
+            dep.setOver(true);
+            await sleep(1000);
+        }
 
         shape.select();
-        shape.isOver = true;
-        View.current.dirty = true;
+        shape.setOver(true);
+        await sleep(1000);
 
         await speech.waitEnd();
 
-        shape.dependencies().forEach(x => {x.unselect(); x.isOver = false;});
+        shape.dependencies().forEach(x => {x.unselect(); x.setOver(false);});
 
         shape.unselect();
-        shape.isOver = false;
-        View.current.dirty = true;
+        shape.setOver(false);
     }
     
 }
