@@ -617,53 +617,56 @@ function addTexDiv(){
     return div;
 }
 
-export async function startMovie(){
-
-    const texts = ($("sample") as HTMLTextAreaElement).value.replace("\r\n", "\n").split("\n").map(x => x.trim()).filter(x => x != "");
-    for(const text of texts){
-        msg(text);
-        const term = parseMath(text);
-        if(term instanceof App){
-
-            const div = addTexDiv();
-            await doGenerator( showFlow(term, div), 1 );
-        }
-        else{
-
-            msg(`${term.constructor.name}`);
-            throw new MyError();
-        }
-    }
-}
-
-
-
 export async function play() {
     const speech = new Speech();
     for(const shape of View.current.shapes){
-        const text = shape.reading().toString().trim();        
+        if(shape instanceof plane_ts.TextBlock){
 
-        msg(`reading:${shape.constructor.name} ${text}`);
-        if(text != ""){
-            speech.speak(text);
+            shape.div.innerHTML = "";
+            const texts = shape.text.replace("\r\n", "\n").split("\n").map(x => x.trim()).filter(x => x != "");
+            for(const text of texts){
+                msg(text);
+                const term = parseMath(text);
+                if(term instanceof App){
+
+                    const div = document.createElement("div");
+                    shape.div.append(div);
+                    
+                    await doGenerator( showFlow(term, div), 1 );
+                }
+                else{
+        
+                    msg(`${term.constructor.name}`);
+                    throw new MyError();
+                }    
+            }
         }
+        else{
 
-        for(const dep of shape.dependencies()){
-            dep.select();
-            dep.setOver(true);
+            const text = shape.reading().toString().trim();        
+
+            msg(`reading:${shape.constructor.name} ${text}`);
+            if(text != ""){
+                speech.speak(text);
+            }
+
+            for(const dep of shape.dependencies()){
+                dep.select();
+                dep.setOver(true);
+                await sleep(1000);
+            }
+
+            shape.select();
+            shape.setOver(true);
             await sleep(1000);
+
+            await speech.waitEnd();
+
+            shape.dependencies().forEach(x => {x.unselect(); x.setOver(false);});
+
+            shape.unselect();
+            shape.setOver(false);
         }
-
-        shape.select();
-        shape.setOver(true);
-        await sleep(1000);
-
-        await speech.waitEnd();
-
-        shape.dependencies().forEach(x => {x.unselect(); x.setOver(false);});
-
-        shape.unselect();
-        shape.setOver(false);
     }
     
 }

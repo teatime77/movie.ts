@@ -16,10 +16,6 @@ export async function bodyOnLoad(){
         await play();
     })
 
-    $("movie-start").addEventListener("click", (ev : MouseEvent)=>{
-        startMovie();
-    });
-
     $("movie-write-db").addEventListener("click", (ev : MouseEvent)=>{
         writeDB();
     });
