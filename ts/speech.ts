@@ -43,7 +43,7 @@ export class Phrase {
 
 export class Speech {
     prevCharIndex = 0;
-    callback! : (idx:number)=>void;
+    callback : ((idx:number)=>void) | undefined;
     speaking : boolean = false;
 
     constructor(){        
