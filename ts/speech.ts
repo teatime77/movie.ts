@@ -8,9 +8,56 @@ let uttrVoice : SpeechSynthesisVoice |  undefined;
 let voiceLangSelect : HTMLSelectElement;
 let voiceNameSelect : HTMLSelectElement;
 
-// const voiceLang = "ja-JP";
 let voiceLang = "en-US";
 let voiceName : string;
+
+const voiceMap = new Map<string, SpeechSynthesisVoice[]>();
+
+const langCodeMap = new Map<string, string>([
+    ["ara", "ar-EG"],
+    ["chi", "zh-CN"],
+    ["eng", "en-US"],
+    ["fre", "fr-FR"],
+    ["ger", "de-DE"],
+    ["hin", "hi-IN"],
+    ["ind", "id-ID"],
+    ["jpn", "ja-JP"],
+    ["kor", "ko-KR"],
+    ["rus", "ru-RU"],
+    ["spa", "es-ES"],
+]);
+
+function getVoiceByLangCode(lang_code : string) : SpeechSynthesisVoice {
+    const language_region = langCodeMap.get(lang_code);
+    if(language_region == undefined){
+        throw new MyError();
+    }
+
+    const voices = voiceMap.get(language_region);
+    if(voices == undefined){
+        throw new MyError();
+    }
+    for(const voice of voices){
+        msg(`${voice.lang} [${voice.name}] ${voice.default} ${voice.localService} ${voice.voiceURI}`);
+    }
+
+    const default_names = voiceNamesDic[language_region];
+    if(default_names != undefined){
+        for(const name of default_names){
+            const voice = voices.find(x => x.name == name);
+            if(voice != undefined){
+                return voice;
+            }
+        }
+    }
+
+    const natural_voice = voices.find(x => x.name.indexOf("Online (Natural)") != -1);
+    if(natural_voice != undefined){
+        return natural_voice;
+    }
+
+    return voices[0];
+}
 
 
 const voiceNamesDic : { [lang: string]: string[] } = {
@@ -24,8 +71,6 @@ const voiceNamesDic : { [lang: string]: string[] } = {
         "Microsoft Ava Online (Natural) - English (United States)"
     ]
 };
-
-const voices : { [lang: string]: SpeechSynthesisVoice[] } = {};
 
 let prevCharIndex = 0;
 let Phrases : Phrase[] = [];
@@ -42,11 +87,13 @@ export class Phrase {
 }
 
 export class Speech {
+    voice : SpeechSynthesisVoice;
     prevCharIndex = 0;
     callback : ((idx:number)=>void) | undefined;
     speaking : boolean = false;
 
-    constructor(){        
+    constructor(lang_code : string){        
+        this.voice = getVoiceByLangCode(lang_code);
     }
 
     speak(text : string){
@@ -57,7 +104,7 @@ export class Speech {
         
             const uttr = new SpeechSynthesisUtterance(text);
         
-            uttr.voice = uttrVoice!;
+            uttr.voice = this.voice;
 
             uttr.addEventListener("end", this.onEnd.bind(this));
             uttr.addEventListener("boundary", this.onBoundary.bind(this));
@@ -160,7 +207,7 @@ function setVoiceByLang(lang : string){
     let default_opt : HTMLOptionElement | undefined = undefined;
 
     let voice_priority = 100;
-    for(const voice of voices[lang]){
+    for(const voice of voiceMap.get(lang)!){
         const opt = document.createElement("option");
         opt.text = voice.name;
         opt.value = voice.name;
@@ -194,8 +241,12 @@ function setVoiceByLang(lang : string){
 
 function setVoiceList(){
     for(const voice of speechSynthesis.getVoices()){
-        if(voices[voice.lang] == undefined){
-            voices[voice.lang] = [];
+        // msg(`voice lang:${voice.lang} name:${voice.name}`);
+
+        if(voiceMap.get(voice.lang) == undefined){
+            voiceMap.set(voice.lang, []);
+
+            msg(`voice lang:${voice.lang}`);
 
             const opt = document.createElement("option");
             opt.text = voice.lang;
@@ -206,18 +257,14 @@ function setVoiceList(){
             voiceLangSelect.add(opt);
         }
 
-        voices[voice.lang].push(voice);
-        if(voice.lang == "ja-JP" || voice.lang == "en-US"){
-
-            msg(`${voice.lang} [${voice.name}] ${voice.default} ${voice.localService} ${voice.voiceURI}`);
-        }
+        voiceMap.get(voice.lang)!.push(voice);
     }
 
     setVoiceByLang(voiceLang);
 }
 
 function setVoice(){
-    uttrVoice = voices[voiceLang].find(voice => voice.name == voiceName);
+    uttrVoice = voiceMap.get(voiceLang)!.find(voice => voice.name == voiceName);
     assert(uttrVoice != undefined);
 }
 
@@ -264,7 +311,7 @@ export async function asyncInitSpeech() : Promise<void> {
     return new Promise((resolve) => {
         speechSynthesis.addEventListener("voiceschanged", (ev:Event)=>{
             setVoiceList();
-            theSpeech = new Speech();
+            theSpeech = new Speech("eng");
             msg("speech initialized");
             resolve();
         })

@@ -4,7 +4,9 @@ let theDoc : firebase_ts.DbDoc | undefined;
 
 export async function bodyOnLoad(){
     i18n_ts.initI18n();
-    plane_ts.initPlane($div("menu-bar"), $div("shape-tool"), $div("canvas-div"), $div("property-div"));
+    i18n_ts.initLanguageBar($("language-bar"));
+
+    plane_ts.initPlane($("menu-bar"), $div("shape-tool"), $div("canvas-div"), $div("property-div"));
     
     await includeDialog("./lib/firebase/dialog.html");
     await includeDialog("./lib/movie/dialog.html");

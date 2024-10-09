@@ -618,7 +618,6 @@ function addTexDiv(){
 }
 
 export async function play() {
-    const speech = new Speech();
     for(const shape of View.current.shapes){
         if(shape instanceof plane_ts.TextBlock){
 
@@ -642,26 +641,23 @@ export async function play() {
             }
         }
         else{
+            const speech = new Speech(i18n_ts.languageCode);
 
-            const readings = shape.reading().getAllReadings();
+            const root_reading = shape.reading();
+            const text = root_reading.prepareReading();
+
+            const readings = root_reading.getAllReadings();
             for(const reading of readings){
-                msg(`reading:${reading.start}->${reading.end} ${reading.getText()}`);
-            }
-            const text = shape.reading().getText();
-
-            msg(`reading:${shape.constructor.name} ${text}`);
-            if(text != ""){
-                speech.speak(text);
+                msg(`reading:${reading.start}->${reading.end} ${reading.text}`);
             }
 
-            let highlighted = new Set<Reading>();
             speech.callback = (idx : number)=>{
                 msg(`char idx:${idx}`);
                 for(const reading of readings){
                     if(reading.start <= idx){
 
                         if(!highlighted.has(reading)){
-                            msg(`hilight:${reading.getText()}`);
+                            msg(`hilight: start:${reading.start} ${reading.text}`);
                             reading.readable.highlight(true);
                             highlighted.add(reading);
                         }
@@ -669,12 +665,18 @@ export async function play() {
                 }
             }
 
+            msg(`reading:${shape.constructor.name} ${text}`);
+            if(text != ""){
+                speech.speak(text);
+            }
+
+            let highlighted = new Set<Reading>();
+
             // for(const dep of shape.dependencies()){
             //     dep.select();
             //     dep.setOver(true);
             //     await sleep(1000);
             // }
-
 
             await speech.waitEnd();
 
