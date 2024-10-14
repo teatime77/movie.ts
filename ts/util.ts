@@ -10,6 +10,9 @@ export function $(id : string) : HTMLElement {
     let ele = $dic.get(id);
     if(ele == undefined){
         ele = document.getElementById(id)!;
+        if(ele == undefined){
+            ele = root.getElementById(id)!;
+        }
         $dic.set(id, ele);
     }
 

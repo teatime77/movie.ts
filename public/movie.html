@@ -38,35 +38,19 @@
     onload="renderMathInElement(document.body);"></script>
 <!------------------------------------ katex end   -------------------------------------->
 
-<script type="text/javascript" src="lib/i18n/i18n.js?ver=21"></script>
-<script type="text/javascript" src="lib/parser/parser.js?ver=21"></script>
-<script type="text/javascript" src="lib/plane/plane.js?ver=21"></script>
-<script type="text/javascript" src="lib/firebase/firebase.js?ver=21"></script>
-<script type="text/javascript" src="lib/movie/movie.js?ver=21"></script>
+<script type="text/javascript" src="lib/i18n/i18n.js?ver=25"></script>
+<script type="text/javascript" src="lib/layout/layout.js?ver=25"></script>
+<script type="text/javascript" src="lib/parser/parser.js?ver=25"></script>
+<script type="text/javascript" src="lib/plane/plane.js?ver=25"></script>
+<script type="text/javascript" src="lib/firebase/firebase.js?ver=25"></script>
+<script type="text/javascript" src="lib/movie/movie.js?ver=25"></script>
 
 
 <style type="text/css">
 </style>
 
 </head>
-
 <body>
-
-<span id="menu-bar"></span>
-<span id="language-bar" ></span>
-<br/>
-
-<div style="display: flex; width: 100%; height:max-content;">
-    <div id="shape-tool"   style="flex-grow: 0; "></div>
-    <div id="canvas-div"   style="flex-grow: 1; " ></div>
-    <div id="property-div" style="flex-grow: 0; width: 300px;"></div>
-</div>
-        
-<button id="movie-play" >Play</button>
-<button id="movie-write-db" >Write DB</button>
-<button id="movie-show-firebase" >firebase</button>
-<button id="show-contents" >show contents</button>
-
 <div id="katex-div" style="display: none; width: 1280px;; height: 670px; overflow-y: scroll;" ></div>
 
 <script>
