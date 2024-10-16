@@ -1,5 +1,7 @@
 namespace movie_ts {
 //
+type Block = layout_ts.Block;
+
 let theDoc : firebase_ts.DbDoc | undefined;
 export let root : layout_ts.Grid;
 
@@ -10,13 +12,12 @@ const $button = layout_ts.$button;
 export async function bodyOnLoad(){
     i18n_ts.initI18n();
 
-    root = makeGrid();
+    const [root, menu_block, tool_block, text_block, canvas_block, property_block] = makeGrid();
     layout_ts.initLayout(root);
-
 
     i18n_ts.initLanguageBar($("language-bar"));
 
-    plane_ts.initPlane($("menu-bar"), $div("shape-tool"), $div("canvas-div"), $div("property-div"));
+    plane_ts.initPlane(root, menu_block, tool_block, text_block, canvas_block, property_block);
     
     await includeDialog("./lib/firebase/dialog.html");
     await includeDialog("./lib/movie/dialog.html");
@@ -43,7 +44,8 @@ export async function bodyOnLoad(){
     });
 }
 
-function makeGrid(){
+function makeGrid() : [ layout_ts.Grid, Block, Block, Block, Block, Block ] {
+    const [ menu_block, tool_block, text_block, canvas_block, property_block ] = plane_ts.makeUIs();
 
     const root = $grid({
         rows     : "50px 50px 100%",
@@ -57,11 +59,7 @@ function makeGrid(){
             $grid({
                 columns  : "50% 50%",
                 children: [
-                    $block({
-                        id : "menu-bar",
-                        children : [],
-                        backgroundColor : "lime",
-                    })
+                    menu_block
                     ,
                     $block({
                         children : [
@@ -95,36 +93,19 @@ function makeGrid(){
                 columns  : "50px 50% 50% 300px",
 
                 children : [
-                    $block({
-                        id : "shape-tool",
-                        children : [],
-                        backgroundColor : "green",
-                    })
+                    tool_block
                     ,
-                    $block({
-                        children : [],
-                        aspectRatio : 1,
-                        backgroundColor : "blue",
-                    })
+                    text_block
                     ,
-                    $block({
-                        id : "canvas-div",
-                        children : [],
-                        aspectRatio : 1,
-                        backgroundColor : "orange",
-                    })
+                    canvas_block
                     ,
-                    $block({
-                        id : "property-div",
-                        children : [],
-                        backgroundColor : "cyan",
-                    }),
+                    property_block
                 ]
             })
         ]
     });
 
-    return root;    
+    return [root, menu_block, tool_block, text_block, canvas_block, property_block];    
 }
 
 async function readDoc(id : number) {
