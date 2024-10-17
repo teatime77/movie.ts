@@ -672,11 +672,15 @@ export async function play() {
 
             let highlighted = new Set<Reading>();
 
-            // for(const dep of shape.dependencies()){
-            //     dep.select();
-            //     dep.setOver(true);
-            //     await sleep(1000);
-            // }
+            if(shape instanceof plane_ts.Statement){
+
+                for(const dep of shape.dependencies()){
+                    msg(`select : ${dep.constructor.name}`);
+                    dep.select();
+                    dep.setOver(true);
+                    await sleep(1000);
+                }
+            }
 
             await speech.waitEnd();
 
