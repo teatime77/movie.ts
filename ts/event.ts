@@ -5,6 +5,7 @@ type Block = layout_ts.Block;
 let theDoc : firebase_ts.DbDoc | undefined;
 export let root : layout_ts.Grid;
 
+const $flex = layout_ts.$flex;
 const $grid = layout_ts.$grid;
 const $block = layout_ts.$block;
 const $button = layout_ts.$button;
@@ -45,10 +46,10 @@ export async function bodyOnLoad(){
 }
 
 function makeGrid() : [ layout_ts.Grid, Block, Block, Block, Block, Block ] {
-    const [ menu_block, tool_block, text_block, canvas_block, property_block ] = plane_ts.makeUIs();
+    const [ menu_block, tool_block, text_block, canvas_block, property_block, shapes_block ] = plane_ts.makeUIs();
 
     const root = $grid({
-        rows     : "50px 50px 100%",
+        rows     : "25px 25px 100% 25px",
         children:[
             $block({
                 id : "language-bar",
@@ -102,6 +103,8 @@ function makeGrid() : [ layout_ts.Grid, Block, Block, Block, Block, Block ] {
                     property_block
                 ]
             })
+            ,
+            shapes_block
         ]
     });
 
