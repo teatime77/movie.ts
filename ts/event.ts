@@ -61,7 +61,7 @@ function makeGrid(plane : plane_ts.Plane) : layout_ts.Grid {
                 children: [
                     plane.menu_block
                     ,
-                    $block({
+                    $flex({
                         children : [
                             $button({
                                 id : "movie-play",
