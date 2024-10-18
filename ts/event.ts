@@ -13,12 +13,13 @@ const $button = layout_ts.$button;
 export async function bodyOnLoad(){
     i18n_ts.initI18n();
 
-    const [root, menu_block, tool_block, text_block, canvas_block, property_block] = makeGrid();
+    const plane = new plane_ts.Plane();
+    const root = makeGrid(plane);
     layout_ts.initLayout(root);
 
     i18n_ts.initLanguageBar($("language-bar"));
 
-    plane_ts.initPlane(root, menu_block, tool_block, text_block, canvas_block, property_block);
+    plane_ts.initPlane(plane, root);
     
     await includeDialog("./lib/firebase/dialog.html");
     await includeDialog("./lib/movie/dialog.html");
@@ -45,9 +46,7 @@ export async function bodyOnLoad(){
     });
 }
 
-function makeGrid() : [ layout_ts.Grid, Block, Block, Block, Block, Block ] {
-    const [ menu_block, tool_block, text_block, canvas_block, property_block, shapes_block ] = plane_ts.makeUIs();
-
+function makeGrid(plane : plane_ts.Plane) : layout_ts.Grid {
     const root = $grid({
         rows     : "25px 25px 100% 25px",
         children:[
@@ -60,7 +59,7 @@ function makeGrid() : [ layout_ts.Grid, Block, Block, Block, Block, Block ] {
             $grid({
                 columns  : "50% 50%",
                 children: [
-                    menu_block
+                    plane.menu_block
                     ,
                     $block({
                         children : [
@@ -94,21 +93,21 @@ function makeGrid() : [ layout_ts.Grid, Block, Block, Block, Block, Block ] {
                 columns  : "50px 50% 50% 300px",
 
                 children : [
-                    tool_block
+                    plane.tool_block
                     ,
-                    text_block
+                    plane.text_block
                     ,
-                    canvas_block
+                    plane.canvas_block
                     ,
-                    property_block
+                    plane.property_block
                 ]
             })
             ,
-            shapes_block
+            plane.shapes_block
         ]
     });
 
-    return [root, menu_block, tool_block, text_block, canvas_block, property_block];    
+    return root;    
 }
 
 async function readDoc(id : number) {
