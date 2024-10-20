@@ -586,7 +586,7 @@ export function allTexNodes(node : TexNode) : TexNode[] {
     return terms;
 }
 
-function *showFlow(root : App, div : HTMLDivElement){
+function *showFlow(speech : Speech, root : App, div : HTMLDivElement){
     root.setParent(null);
     root.setTabIdx();
 
@@ -596,14 +596,14 @@ function *showFlow(root : App, div : HTMLDivElement){
 
     const text = makeTextFromPhrases(phrases);
 
-    theSpeech.speak(text);
+    speech.speak(text);
 
-    for(const s of node.genTex(theSpeech)){
+    for(const s of node.genTex(speech)){
         renderKatexSub(div, s);
         yield;
     }
 
-    while(theSpeech != null && theSpeech.speaking){
+    while(speech != null && speech.speaking){
         yield;
     }
 }
@@ -618,6 +618,8 @@ function addTexDiv(){
 }
 
 export async function play() {
+    const speech = new Speech(i18n_ts.languageCode);
+
     for(const shape of View.current.shapes){
         if(shape instanceof plane_ts.TextBlock){
 
@@ -631,7 +633,7 @@ export async function play() {
                     const div = document.createElement("div");
                     shape.div.append(div);
                     
-                    await doGenerator( showFlow(term, div), 1 );
+                    await doGenerator( showFlow(speech, term, div), 1 );
                 }
                 else{
         
@@ -641,7 +643,6 @@ export async function play() {
             }
         }
         else{
-            const speech = new Speech(i18n_ts.languageCode);
 
             const root_reading = shape.reading();
             const text = root_reading.prepareReading();

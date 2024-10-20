@@ -1,8 +1,6 @@
 namespace movie_ts{
 export let speechOn = true;
 
-export let theSpeech : Speech;
-
 let uttrVoice : SpeechSynthesisVoice |  undefined;
 
 let voiceLangSelect : HTMLSelectElement;
@@ -92,7 +90,11 @@ export class Speech {
     callback : ((idx:number)=>void) | undefined;
     speaking : boolean = false;
 
-    constructor(lang_code : string){        
+    constructor(lang_code : string){    
+        if(voiceMap.size == 0){
+            setVoiceList();
+        }
+
         this.voice = getVoiceByLangCode(lang_code);
     }
 
@@ -243,21 +245,28 @@ function setVoiceList(){
     for(const voice of speechSynthesis.getVoices()){
         // msg(`voice lang:${voice.lang} name:${voice.name}`);
 
-        if(voiceMap.get(voice.lang) == undefined){
-            voiceMap.set(voice.lang, []);
+        let voice_lang = voice.lang.replaceAll("_", "-");
+        const k = voice_lang.indexOf("-#");
+        if(k != -1){
+            voice_lang = voice_lang.substring(0, k);
+            msg(`lang:${voice.lang} => ${voice_lang}`);
+        }
 
-            msg(`voice lang:${voice.lang}`);
+        if(voiceMap.get(voice_lang) == undefined){
+            voiceMap.set(voice_lang, []);
+
+            msg(`voice lang:${voice_lang}`);
 
             const opt = document.createElement("option");
-            opt.text = voice.lang;
-            opt.value = voice.lang;
-            if(voice.lang == voiceLang){
+            opt.text = voice_lang;
+            opt.value = voice_lang;
+            if(voice_lang == voiceLang){
                 opt.selected = true;
             }
             voiceLangSelect.add(opt);
         }
 
-        voiceMap.get(voice.lang)!.push(voice);
+        voiceMap.get(voice_lang)!.push(voice);
     }
 
     setVoiceByLang(voiceLang);
@@ -290,6 +299,9 @@ function initSpeechSub(){
 
     if ('speechSynthesis' in window) {
         msg("このブラウザは音声合成に対応しています。🎉");
+
+        const uttr = new SpeechSynthesisUtterance("hello");
+        speechSynthesis.speak(uttr);
     }
     else {
         msg("このブラウザは音声合成に対応していません。😭");
@@ -300,9 +312,15 @@ export function initSpeech(){
     initSpeechSub();
 
     speechSynthesis.onvoiceschanged = function(){
-        msg("voices changed");
+        msg("voices changed 1");
         setVoiceList();
     };
+
+    speechSynthesis.addEventListener("voiceschanged", (ev:Event)=>{
+        setVoiceList();
+        msg("voices changed 2");
+    })
+
 }
 
 export async function asyncInitSpeech() : Promise<void> {
@@ -311,7 +329,6 @@ export async function asyncInitSpeech() : Promise<void> {
     return new Promise((resolve) => {
         speechSynthesis.addEventListener("voiceschanged", (ev:Event)=>{
             setVoiceList();
-            theSpeech = new Speech("eng");
             msg("speech initialized");
             resolve();
         })

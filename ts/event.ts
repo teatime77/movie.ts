@@ -24,7 +24,8 @@ export async function bodyOnLoad(){
     await includeDialog("./lib/firebase/dialog.html");
     await includeDialog("./lib/movie/dialog.html");
 
-    await asyncInitSpeech();
+    // await asyncInitSpeech();
+    initSpeech();
 
     firebase_ts.initFirebase();
 
