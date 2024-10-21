@@ -1,5 +1,3 @@
-// import type {ConstNum} from 'parser.d.ts'
-
 type Term = parser_ts.Term;
 const Term = parser_ts.Term;
 
@@ -648,12 +646,11 @@ export async function play() {
             const text = root_reading.prepareReading();
 
             const readings = root_reading.getAllReadings();
-            for(const reading of readings){
-                msg(`reading:${reading.start}->${reading.end} ${reading.text}`);
-            }
+
+            msg(`reading:${shape.constructor.name} ${text}`);
+            msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
 
             speech.callback = (idx : number)=>{
-                msg(`char idx:${idx}`);
                 for(const reading of readings){
                     if(reading.start <= idx){
 
@@ -666,7 +663,6 @@ export async function play() {
                 }
             }
 
-            msg(`reading:${shape.constructor.name} ${text}`);
             if(text != ""){
                 speech.speak(text);
             }

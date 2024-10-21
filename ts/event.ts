@@ -1,6 +1,7 @@
 namespace movie_ts {
 //
 type Block = layout_ts.Block;
+type Button = layout_ts.Button;
 
 let theDoc : firebase_ts.DbDoc | undefined;
 export let root : layout_ts.Grid;
@@ -11,11 +12,52 @@ const $block = layout_ts.$block;
 const $button = layout_ts.$button;
 
 export async function bodyOnLoad(){
+    const params = getQueryParams(document.location.href);
+    msg(`params:${JSON.stringify(params) }`);
+
+    const edit_mode = (params["mode"] == "edit");
+
     i18n_ts.initI18n();
 
     const plane = new plane_ts.Plane();
-    const root = makeGrid(plane);
+    let root : layout_ts.Grid;
+
+    const play_button = $button({
+        id : "movie-play",
+        text : "Play",
+        click : async (ev : MouseEvent)=>{
+            await play();
+        }
+    });
+
+    const show_contents_button = $button({
+        id : "show-contents",
+        text : "show contents",
+        click : async (ev : MouseEvent)=>{
+            firebase_ts.showContents(readDoc);
+        }
+    });
+
+    if(edit_mode){
+
+        root = makeEditGrid(plane, play_button, show_contents_button);
+    }
+    else{
+        root = makePlayGrid(plane, play_button, show_contents_button);
+    }
+
     layout_ts.initLayout(root);
+
+    if(edit_mode){
+
+        $("movie-write-db").addEventListener("click", (ev : MouseEvent)=>{
+            writeDB();
+        });
+
+        $("movie-show-firebase").addEventListener("click", (ev : MouseEvent)=>{
+            $dlg("firebase-menu").showModal();        
+        });
+    }
 
     i18n_ts.initLanguageBar($("language-bar"));
 
@@ -29,25 +71,12 @@ export async function bodyOnLoad(){
 
     firebase_ts.initFirebase();
 
-    $("movie-play").addEventListener("click", async (ev : MouseEvent)=>{
-        await play();
-    })
-
-    $("movie-write-db").addEventListener("click", (ev : MouseEvent)=>{
-        writeDB();
-    });
-
-    $("movie-show-firebase").addEventListener("click", (ev : MouseEvent)=>{
-        $dlg("firebase-menu").showModal();        
-    });
-
-
-    $("show-contents").addEventListener("click", (ev : MouseEvent)=>{
-        firebase_ts.showContents(readDoc);
-    });
+    const size = layout_ts.getPhysicalSize();
+    msg(`size:${size.width_cm.toFixed(1)} ${size.height_cm.toFixed(1)}`);
+    msg(`navigator:${navigator.appVersion}`);
 }
 
-function makeGrid(plane : plane_ts.Plane) : layout_ts.Grid {
+function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_contents_button : Button) : layout_ts.Grid {
     const root = $grid({
         rows     : "25px 25px 100% 25px",
         children:[
@@ -64,10 +93,7 @@ function makeGrid(plane : plane_ts.Plane) : layout_ts.Grid {
                     ,
                     $flex({
                         children : [
-                            $button({
-                                id : "movie-play",
-                                text : "Play"
-                            })
+                            play_button
                             ,
                             $button({
                                 id : "movie-write-db",
@@ -79,11 +105,14 @@ function makeGrid(plane : plane_ts.Plane) : layout_ts.Grid {
                                 text : "firebase"
                             })
                             ,
-                            $button({
-                                id : "show-contents",
-                                text : "show contents"
-                            })
+                            show_contents_button
                             ,
+                            $button({
+                                text : "log",
+                                click : async (ev:MouseEvent)=>{
+                                    layout_ts.Log.show(ev);
+                                }
+                            })
                         ],
                         backgroundColor : "violet",
                     })
@@ -111,6 +140,63 @@ function makeGrid(plane : plane_ts.Plane) : layout_ts.Grid {
     return root;    
 }
 
+function makePlayGrid(plane : plane_ts.Plane, play_button : Button, show_contents_button : Button) : layout_ts.Grid {
+    let content_grid : layout_ts.Grid;
+    if(window.innerHeight < window.innerWidth ){
+        content_grid = $grid({
+            columns  : "50% 50%",
+
+            children : [
+                plane.text_block
+                ,
+                plane.canvas_block
+            ]
+        })
+    }
+    else{
+
+        content_grid = $grid({
+            rows  : "50% 50%",
+
+            children : [
+                plane.canvas_block
+                ,
+                plane.text_block
+            ]
+        })
+    }
+    
+    const root = $grid({
+        rows     : "25px 25px 100% 25px",
+        children:[
+            $block({
+                id : "language-bar",
+                children : [],
+                backgroundColor : "chocolate",
+            })
+            ,
+            $flex({
+                children : [
+                    play_button
+                    ,
+                    show_contents_button
+                    ,
+                    $button({
+                        text : "log",
+                        click : async (ev:MouseEvent)=>{
+                            layout_ts.Log.show(ev);
+                        }
+                    })
+                ],
+                backgroundColor : "violet",
+            })
+            ,
+            content_grid
+        ]
+    });
+
+    return root;    
+}
 async function readDoc(id : number) {
     msg(`id:${id}`);
     theDoc = await firebase_ts.getDoc(id);

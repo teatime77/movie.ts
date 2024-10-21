@@ -45,7 +45,7 @@ export function assert(b : boolean, msg : string = ""){
 }    
 
 export function msg(txt : string){
-    console.log(txt);
+    layout_ts.Log.log(txt);
 }
 
 export function range(n: number) : number[]{
@@ -112,6 +112,20 @@ export async function sleep(milliseconds : number) : Promise<void> {
             resolve();
         }, milliseconds);
     });
+}
+
+export function getQueryParams(url : string) {
+    const params : { [key:string] : string  } = {};
+    const parser = new URL(url);
+    const queryString = parser.search.substring(1);
+    const queries = queryString.split("&");
+
+    queries.forEach(query => {
+        const [key, value] = query.split("=");
+        params[decodeURIComponent(key)] = decodeURIComponent(value);
+    });
+
+    return params;
 }
 
 
