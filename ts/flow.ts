@@ -19,6 +19,9 @@ const parseMath = parser_ts.parseMath;
 
 const View = plane_ts.View;
 
+const Statement = plane_ts.Statement;
+type Statement = plane_ts.Statement;
+
 namespace movie_ts {
 //
 function symbol2words(symbol: string) : string {
@@ -615,6 +618,9 @@ function addTexDiv(){
     return div;
 }
 
+export async function playStatement(statement : Statement, speech : Speech) {
+}
+ 
 export async function play() {
     const speech = new Speech(i18n_ts.languageCode);
 
@@ -669,14 +675,8 @@ export async function play() {
 
             let highlighted = new Set<Reading>();
 
-            if(shape instanceof plane_ts.Statement){
-
-                for(const dep of shape.dependencies()){
-                    msg(`select : ${dep.constructor.name}`);
-                    dep.select();
-                    dep.setOver(true);
-                    await sleep(1000);
-                }
+            if(shape instanceof Statement){
+                await shape.play(speech);
             }
 
             await speech.waitEnd();

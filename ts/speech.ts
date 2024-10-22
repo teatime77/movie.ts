@@ -59,13 +59,16 @@ function getVoiceByLangCode(lang_code : string) : SpeechSynthesisVoice | undefin
     return voices[0];
 }
 
-export class Speech {
+export class Speech extends i18n_ts.AbstractSpeech {
     voice? : SpeechSynthesisVoice;
     prevCharIndex = 0;
-    callback : ((idx:number)=>void) | undefined;
     speaking : boolean = false;
 
-    constructor(lang_code : string){    
+    constructor(lang_code : string){ 
+        super();
+
+        i18n_ts.AbstractSpeech.one = this;
+
         if(voiceMap.size == 0){
             setVoiceList();
         }
@@ -76,7 +79,7 @@ export class Speech {
         }
     }
 
-    speak(text : string){
+    speak(text : string) : void {
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);
 
         this.prevCharIndex = 0;
@@ -133,7 +136,7 @@ export class Speech {
     onMark(ev: SpeechSynthesisEvent) : void {
     }
 
-    async waitEnd() : Promise<void> {
+    waitEnd() : Promise<void> {
         return new Promise((resolve) => {
             const id = setInterval(()=>{
                 if(! this.speaking){
