@@ -4,6 +4,7 @@ ts/@types
 public/lib/i18n
 public/lib/firebase
 public/lib/parser
+public/lib/layout
 public/lib/plane
 public/lib/movie
 install.bat
