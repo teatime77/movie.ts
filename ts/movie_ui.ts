@@ -28,6 +28,13 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
                             play_button
                             ,
                             $button({
+                                text : "statement",
+                                click : async (ev:MouseEvent)=>{
+                                    plane_ts.StatementTool.start(ev);
+                                }
+                            })
+                            ,
+                            $button({
                                 text : "Write DB",
                                 click : async (ev:MouseEvent)=>{
                                     writeDB();
