@@ -22,6 +22,8 @@ const View = plane_ts.View;
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
 
+const Mode = plane_ts.Mode;
+
 namespace movie_ts {
 //
 function symbol2words(symbol: string) : string {
@@ -648,32 +650,39 @@ export async function play() {
         }
         else{
 
-            const root_reading = shape.reading();
-            const text = root_reading.prepareReading();
+            let highlighted = new Set<Reading>();
 
-            const readings = root_reading.getAllReadings();
+            if(shape.narration != ""){
 
-            msg(`reading:${shape.constructor.name} ${text}`);
-            msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
+                speech.speak(shape.narration);
+            }
+            else{
 
-            speech.callback = (idx : number)=>{
-                for(const reading of readings){
-                    if(reading.start <= idx){
+                const root_reading = shape.reading();
+                const text = root_reading.prepareReading();
 
-                        if(!highlighted.has(reading)){
-                            msg(`hilight: start:${reading.start} ${reading.text}`);
-                            reading.readable.highlight(true);
-                            highlighted.add(reading);
+                const readings = root_reading.getAllReadings();
+
+                msg(`reading:${shape.constructor.name} ${text}`);
+                msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
+
+                speech.callback = (idx : number)=>{
+                    for(const reading of readings){
+                        if(reading.start <= idx){
+
+                            if(!highlighted.has(reading)){
+                                msg(`hilight: start:${reading.start} ${reading.text}`);
+                                reading.readable.highlight(true);
+                                highlighted.add(reading);
+                            }
                         }
                     }
                 }
-            }
 
-            if(text != ""){
-                speech.speak(text);
+                if(text != ""){
+                    speech.speak(text);
+                }
             }
-
-            let highlighted = new Set<Reading>();
 
             if(shape instanceof Statement){
                 await shape.play(speech);
@@ -684,10 +693,9 @@ export async function play() {
             Array.from(highlighted.values()).forEach(x => x.readable.highlight(false));
             speech.callback = undefined;
 
-            shape.dependencies().forEach(x => {x.unselect(); x.setOver(false);});
+            shape.dependencies().forEach(x => {x.setMode(Mode.none); });
 
-            shape.unselect();
-            shape.setOver(false);
+            shape.setMode(Mode.none);
         }
     }
     
