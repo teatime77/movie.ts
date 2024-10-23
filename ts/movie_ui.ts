@@ -35,9 +35,16 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
                             })
                             ,
                             $button({
-                                text : "Write DB",
+                                text : "new doc",
                                 click : async (ev:MouseEvent)=>{
-                                    writeDB();
+                                    putNewDoc();
+                                }
+                            })
+                            ,
+                            $button({
+                                text : "update doc",
+                                click : async (ev:MouseEvent)=>{
+                                    updateDoc();
                                 }
                             })
                             ,

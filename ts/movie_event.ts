@@ -71,38 +71,63 @@ async function readDoc(id : number) {
     }
 }
 
-export async function writeDB(){
-    let default_name = (theDoc == undefined ? "" : theDoc.name);
-
+function inputDocName(default_name : string) : string {
     let name = prompt("Enter the document name.", default_name);
     if(name == null || name.trim() == ""){
-        return ["", ""];
+        return "";
     }
-    name = name.trim();
+
+    return name.trim();
+}
+
+export async function putNewDoc(){
+    if(theDoc != undefined){
+        alert("document is already read.");
+        return;
+    }
+
+    const name = inputDocName("");
+    if(name == ""){
+        return;
+    }
 
     const json = plane_ts.View.getJson();
     if(json == ""){
         return;
     }
 
-    if(theDoc == undefined){
-        const root_folder = firebase_ts.getRootFolder();
-        if(root_folder == null){
-            return;
-        }
-        try{
+    const root_folder = await firebase_ts.getRootFolder();
+    if(root_folder == null){
+        throw new MyError("can not get root folder.");
+    }
 
-            theDoc = await firebase_ts.putDoc(root_folder, name, json);
-        }
-        catch(e){
-            throw new MyError(`${e}`);
-        }
+    try{
+        theDoc = await firebase_ts.putDoc(root_folder, name, json);
     }
-    else{
-        theDoc.setName(name);
-        theDoc.text = json;
-        theDoc.update();
+    catch(e){
+        throw new MyError(`${e}`);
     }
+}
+
+export async function updateDoc(){
+    if(theDoc == undefined){
+        alert("no document");
+        return;
+    }
+
+    const name = inputDocName(theDoc.name);
+    if(name == ""){
+        return;
+    }
+
+    const json = plane_ts.View.getJson();
+    if(json == ""){
+        return;
+    }
+
+    theDoc.setName(name);
+    theDoc.text = json;
+    theDoc.updateDocDB();
 }
 
 export function SignUp(){
