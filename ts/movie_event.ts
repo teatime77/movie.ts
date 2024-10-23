@@ -7,10 +7,10 @@ export let root : layout_ts.Grid;
 const $button = layout_ts.$button;
 
 export async function bodyOnLoad(){
-    const params = getQueryParams(document.location.href);
+    const [ origin, pathname, params] = i18n_ts.parseURL();
     msg(`params:${JSON.stringify(params) }`);
 
-    const edit_mode = (params["mode"] == "edit");
+    const edit_mode = (params.get("mode") == "edit");
 
     i18n_ts.initI18n();
 
