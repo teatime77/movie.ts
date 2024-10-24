@@ -64,22 +64,30 @@ export class Speech extends i18n_ts.AbstractSpeech {
     prevCharIndex = 0;
     speaking : boolean = false;
 
-    constructor(lang_code : string){ 
+    constructor(){ 
         super();
 
         i18n_ts.AbstractSpeech.one = this;
 
+        this.initVoice();
+    }
+
+    initVoice(){
         if(voiceMap.size == 0){
             setVoiceList();
         }
 
-        this.voice = getVoiceByLangCode(lang_code);
-        if(this.voice != undefined){
-            msg(`use voice:${this.voice.name}`);
+        if(this.voice == undefined){
+
+            this.voice = getVoiceByLangCode(i18n_ts.languageCode);
+            if(this.voice != undefined){
+                msg(`use voice:${this.voice.name}`);
+            }
         }
     }
 
     speak(text : string) : void {
+        this.initVoice();
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);
 
         this.prevCharIndex = 0;
@@ -211,7 +219,7 @@ function initSpeechSub(){
     if ('speechSynthesis' in window) {
         msg("このブラウザは音声合成に対応しています。🎉");
 
-        const speech = new Speech(i18n_ts.languageCode);
+        const speech = new Speech();
         speech.speak("hello");
     }
     else {

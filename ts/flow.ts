@@ -624,7 +624,7 @@ export async function playStatement(statement : Statement, speech : Speech) {
 }
  
 export async function play() {
-    const speech = new Speech(i18n_ts.languageCode);
+    const speech = new Speech();
 
     for(const shape of View.current.shapes){
         if(shape instanceof plane_ts.TextBlock){
