@@ -19,6 +19,7 @@ const parseMath = parser_ts.parseMath;
 
 const View = plane_ts.View;
 
+type AbstractShape = plane_ts.AbstractShape;
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
 
@@ -622,7 +623,19 @@ function addTexDiv(){
 
 export async function playStatement(statement : Statement, speech : Speech) {
 }
- 
+
+async function speakAndHighlight(shape : AbstractShape, speech : Speech, text : string){
+    speech.speak(text);
+
+    for(const dep of shape.dependencies()){
+        dep.setMode(Mode.depend);
+        await sleep(0.5 * 1000 * shape.interval);
+    }
+
+    shape.setMode(Mode.target);
+    await sleep(1000 * shape.interval);
+}
+
 export async function play() {
     const speech = new Speech();
 
@@ -650,42 +663,49 @@ export async function play() {
         }
         else{
 
+            if(shape.mute){
+                continue;
+            }
+
             let highlighted = new Set<Reading>();
 
             if(shape.narration != ""){
 
-                speech.speak(shape.narration);
+                await speakAndHighlight(shape, speech, shape.narration);
             }
             else{
 
                 const root_reading = shape.reading();
-                const text = root_reading.prepareReading();
+                if(root_reading.args.length == 0){
 
-                const readings = root_reading.getAllReadings();
+                    await speakAndHighlight(shape, speech, root_reading.text);
+                }
+                else{
 
-                msg(`reading:${shape.constructor.name} ${text}`);
-                msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
+                    const text = root_reading.prepareReading();
 
-                speech.callback = (idx : number)=>{
-                    for(const reading of readings){
-                        if(reading.start <= idx){
+                    const readings = root_reading.getAllReadings();
 
-                            if(!highlighted.has(reading)){
-                                msg(`hilight: start:${reading.start} ${reading.text}`);
-                                reading.readable.highlight(true);
-                                highlighted.add(reading);
+                    msg(`reading:${shape.constructor.name} ${text}`);
+                    msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
+
+                    speech.callback = (idx : number)=>{
+                        for(const reading of readings){
+                            if(reading.start <= idx){
+
+                                if(!highlighted.has(reading)){
+                                    msg(`hilight: start:${reading.start} ${reading.text}`);
+                                    reading.readable.highlight(true);
+                                    highlighted.add(reading);
+                                }
                             }
                         }
                     }
-                }
 
-                if(text != ""){
-                    speech.speak(text);
+                    if(text != ""){
+                        speech.speak(text);
+                    }                
                 }
-            }
-
-            if(shape instanceof Statement){
-                await shape.play(speech);
             }
 
             await speech.waitEnd();
