@@ -2,6 +2,7 @@ namespace movie_ts {
 //
 type Block = layout_ts.Block;
 type Button = layout_ts.Button;
+const Statement = plane_ts.Statement;
 
 const $flex = layout_ts.$flex;
 const $grid = layout_ts.$grid;
@@ -26,13 +27,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
                     $flex({
                         children : [
                             play_button
-                            ,
-                            $button({
-                                text : "statement",
-                                click : async (ev:MouseEvent)=>{
-                                    plane_ts.StatementTool.start(ev);
-                                }
-                            })
                             ,
                             $button({
                                 text : "new doc",
