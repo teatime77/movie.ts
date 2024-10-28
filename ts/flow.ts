@@ -79,7 +79,7 @@ function isDigit(str : string) {
     return /^\d+$/.test(str);
 }
 
-function pronunciationF(tex_node : TexNode, word : string) : PhraseF | undefined {
+function pronunciationF(tex_node : TexNode, word : string) : Phrase | undefined {
     if(word.endsWith("{")){
         word = word.substring(0, word.length - 1);
     }
@@ -90,14 +90,14 @@ function pronunciationF(tex_node : TexNode, word : string) : PhraseF | undefined
         word = word.substring(1);
         const text = tex2words[word];
         if(text != undefined){
-            return new PhraseF(tex_node, text.split(" "));
+            return new Phrase(tex_node, text.split(" "));
         }
     }
     else{
         const text = symbol2words(word);
         if(text != word){
 
-            return new PhraseF(tex_node, text.split(" "));
+            return new Phrase(tex_node, text.split(" "));
         }
     }
 
@@ -106,14 +106,14 @@ function pronunciationF(tex_node : TexNode, word : string) : PhraseF | undefined
             const char0 = word.charAt(0)
             if(char0.toUpperCase() == char0){
                 
-                return new PhraseF(tex_node, [ "large", word.toLowerCase()]);
+                return new Phrase(tex_node, [ "large", word.toLowerCase()]);
             }
         }
-        return new PhraseF(tex_node, [word]);
+        return new Phrase(tex_node, [word]);
     }
 
     if(isDigit(word)){
-        return new PhraseF(tex_node, [word]);
+        return new Phrase(tex_node, [word]);
     }
 
     if(! oprs.has(word)){
@@ -125,7 +125,7 @@ function pronunciationF(tex_node : TexNode, word : string) : PhraseF | undefined
 }
 
 
-export class PhraseF {
+export class Phrase {
     texNode : TexNode;
     words   : string[];
     start!  : number;
@@ -143,7 +143,7 @@ export class PhraseF {
     }
 }
 
-export function makeTextFromPhrases(phrases : PhraseF[]) : string {
+export function makeTextFromPhrases(phrases : Phrase[]) : string {
     let text = "";
     for(const phrase of phrases){
         phrase.start = text.length;
@@ -165,7 +165,7 @@ abstract class TexNode {
     diction : string | undefined;
     termTex : App | undefined;
 
-    abstract makeSpeech(phrases : PhraseF[]) : void;
+    abstract makeSpeech(phrases : Phrase[]) : void;
 
     term() : Term | undefined {
         return this.termTex;
@@ -210,7 +210,7 @@ abstract class TexBlock extends TexNode {
         this.nodes = nodes;
     }
 
-    makeSpeech(phrases : PhraseF[]) : void {
+    makeSpeech(phrases : Phrase[]) : void {
         this.nodes.forEach(x => x.makeSpeech(phrases));
     }
 }
@@ -238,7 +238,7 @@ class TexSeq extends TexBlock {
 
 abstract class TexLeaf extends TexNode {
     charPos! : number;
-    phrase : PhraseF | undefined;
+    phrase : Phrase | undefined;
 
     constructor(){
         super();
@@ -250,7 +250,7 @@ abstract class TexLeaf extends TexNode {
         return this.texText();
     }
 
-    makeSpeech(phrases : PhraseF[]) : void {
+    makeSpeech(phrases : Phrase[]) : void {
         let text : string;
         if(this.diction != undefined){
             text = this.diction;
@@ -595,7 +595,7 @@ function *showFlow(speech : Speech, root : App, div : HTMLDivElement){
     root.setTabIdx();
 
     const node = makeFlow(root);
-    const phrases : PhraseF[] = [];
+    const phrases : Phrase[] = [];
     node.makeSpeech(phrases);
 
     const text = makeTextFromPhrases(phrases);
