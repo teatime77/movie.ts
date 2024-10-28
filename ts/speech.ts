@@ -61,8 +61,6 @@ function getVoiceByLangCode(lang_code : string) : SpeechSynthesisVoice | undefin
 
 export class Speech extends i18n_ts.AbstractSpeech {
     voice? : SpeechSynthesisVoice;
-    prevCharIndex = 0;
-    speaking : boolean = false;
 
     constructor(){ 
         super();

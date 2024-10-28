@@ -1,5 +1,3 @@
-var katex : any;
-
 namespace movie_ts {
 //
 
