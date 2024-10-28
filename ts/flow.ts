@@ -603,7 +603,7 @@ function *showFlow(speech : Speech, root : App, div : HTMLDivElement){
     speech.speak(text);
 
     for(const s of node.genTex(speech)){
-        renderKatexSub(div, s);
+        layout_ts.renderKatexSub(div, s);
         yield;
     }
 

@@ -53,27 +53,6 @@ export function range(n: number) : number[]{
 }
 
 
-function getUserMacros(){
-    return {
-        "\\dif" : "\\frac{d #1}{d #2}",
-        "\\pdiff" : "\\frac{\\partial #1}{\\partial #2}",
-        "\\pddif" : "\\frac{\\partial^2 #1}{\\partial {#2}^2}",
-        "\\b" : "\\boldsymbol{#1}"
-    };
-}
-
-export function renderKatexSub(ele: HTMLElement, tex_text: string){
-    ele.innerHTML = "";
-        
-    katex.render(tex_text, ele, {
-        throwOnError: false,
-        displayMode : true,
-        trust : true,
-        strict : false, // "ignore", // false, // handler,
-        // newLineInDisplayMode : "ignore",
-        macros : getUserMacros()
-    });
-}
 
 
 export async function doGenerator(iterator : Generator, timeout : number){
