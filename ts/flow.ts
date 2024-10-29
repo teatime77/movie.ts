@@ -22,6 +22,7 @@ const View = plane_ts.View;
 type AbstractShape = plane_ts.AbstractShape;
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
+const TextBlock = plane_ts.TextBlock;
 
 const Mode = plane_ts.Mode;
 
@@ -55,84 +56,99 @@ async function speakAndHighlight(shape : AbstractShape, speech : Speech, text : 
 export async function play() {
     const speech = new Speech();
 
+    const named_all_shape_map = new Map<string, plane_ts.Shape>();
+    const all_shapes = View.current.allShapes();
+    const named_all_shapes = all_shapes.filter(x => x.name != "");
+    named_all_shapes.forEach(x => named_all_shape_map.set(x.name, x));
+
     for(const shape of View.current.shapes){
-        if(shape instanceof plane_ts.TextBlock){
+        if(shape.mute){
+            continue;
+        }
 
-            shape.div.innerHTML = "";
-            const texts = shape.text.replace("\r\n", "\n").split("\n").map(x => x.trim()).filter(x => x != "");
-            for(const text of texts){
-                msg(text);
-                const term = parseMath(text);
-                if(term instanceof App){
+        let highlighted = new Set<Reading>();
 
-                    const div = document.createElement("div");
-                    shape.div.append(div);
-                    
-                    await doGenerator( parser_ts.showFlow(speech, term, div), 1 );
-                }
-                else{
-        
-                    msg(`${term.constructor.name}`);
-                    throw new MyError();
-                }    
-            }
+        if(shape.narration != ""){
+
+            await speakAndHighlight(shape, speech, shape.narration);
         }
         else{
 
-            if(shape.mute){
-                continue;
+            const root_reading = shape.reading();
+            if(root_reading.text == ""){
+
             }
+            else if(root_reading.args.length == 0){
 
-            let highlighted = new Set<Reading>();
-
-            if(shape.narration != ""){
-
-                await speakAndHighlight(shape, speech, shape.narration);
+                await speakAndHighlight(shape, speech, root_reading.text);
             }
             else{
 
-                const root_reading = shape.reading();
-                if(root_reading.args.length == 0){
+                const text = root_reading.prepareReading();
 
-                    await speakAndHighlight(shape, speech, root_reading.text);
-                }
-                else{
+                const readings = root_reading.getAllReadings();
 
-                    const text = root_reading.prepareReading();
+                msg(`reading:${shape.constructor.name} ${text}`);
+                msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
 
-                    const readings = root_reading.getAllReadings();
+                speech.callback = (idx : number)=>{
+                    for(const reading of readings){
+                        if(reading.start <= idx){
 
-                    msg(`reading:${shape.constructor.name} ${text}`);
-                    msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
-
-                    speech.callback = (idx : number)=>{
-                        for(const reading of readings){
-                            if(reading.start <= idx){
-
-                                if(!highlighted.has(reading)){
-                                    msg(`hilight: start:${reading.start} ${reading.text}`);
-                                    reading.readable.highlight(true);
-                                    highlighted.add(reading);
-                                }
+                            if(!highlighted.has(reading)){
+                                msg(`hilight: start:${reading.start} ${reading.text}`);
+                                reading.readable.highlight(true);
+                                highlighted.add(reading);
                             }
                         }
                     }
-
-                    if(text != ""){
-                        speech.speak(text);
-                    }                
                 }
+
+                if(text != ""){
+                    speech.speak(text);
+                }                
             }
-
-            await speech.waitEnd();
-
-            Array.from(highlighted.values()).forEach(x => x.readable.highlight(false));
-            speech.callback = undefined;
-
-            shape.dependencies().forEach(x => {x.setMode(Mode.none); });
-
-            shape.setMode(Mode.none);
         }
+
+        await speech.waitEnd();
+
+        Array.from(highlighted.values()).forEach(x => x.readable.highlight(false));
+        speech.callback = undefined;
+
+        if(shape instanceof TextBlock && shape.isTex || shape instanceof Statement && shape.mathText != ""){
+
+            let text : string;
+            let div  : HTMLDivElement;
+
+            if(shape instanceof TextBlock){
+                text = shape.text;
+                div  = shape.div;
+            }
+            else{
+
+                text = shape.mathText;
+                if(shape.texUI == undefined){
+                    throw new MyError();
+                }
+                div  = shape.texUI.div;
+            }
+            try{
+    
+                const term = parseMath(text);
+
+                await doGenerator( parser_ts.showFlow(speech, term, div, named_all_shape_map), 1 );
+
+            }
+            catch(e){
+                if(e instanceof parser_ts.SyntaxError){
+                    return;
+                }
+    
+                throw e;
+            }
+        }
+
+        all_shapes.forEach(x => {x.setMode(Mode.none); });
     }
     
 }
