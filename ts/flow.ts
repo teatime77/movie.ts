@@ -128,8 +128,9 @@ export async function play() {
 
                 text = shape.mathText;
                 if(shape.texUI == undefined){
-                    throw new MyError();
+                    shape.texUI = shape.makeTexUI();
                 }
+                
                 div  = shape.texUI.div;
             }
             try{
