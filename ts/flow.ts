@@ -19,6 +19,9 @@ const parseMath = parser_ts.parseMath;
 
 const View = plane_ts.View;
 
+type Shape = plane_ts.Shape;
+const Shape = plane_ts.Shape;
+
 type AbstractShape = plane_ts.AbstractShape;
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
@@ -59,7 +62,7 @@ export async function play() {
     const all_shapes = View.current.allShapes();
     all_shapes.forEach(x => x.hide());
 
-    const named_all_shapes = all_shapes.filter(x => x.name != "");
+    const named_all_shapes = all_shapes.filter(x => x instanceof Shape && x.name != "") as Shape[];
     const named_all_shape_map = new Map<string, plane_ts.Shape>();
 
     named_all_shapes.forEach(x => named_all_shape_map.set(x.name, x));
