@@ -22,7 +22,7 @@ const View = plane_ts.View;
 type Shape = plane_ts.Shape;
 const Shape = plane_ts.Shape;
 
-type AbstractShape = plane_ts.AbstractShape;
+type MathEntity = plane_ts.MathEntity;
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
 const TextBlock = plane_ts.TextBlock;
@@ -44,7 +44,7 @@ function addTexDiv(){
 export async function playStatement(statement : Statement, speech : Speech) {
 }
 
-async function speakAndHighlight(shape : AbstractShape, speech : Speech, text : string){
+async function speakAndHighlight(shape : MathEntity, speech : Speech, text : string){
     speech.speak(text);
 
     for(const dep of shape.dependencies()){
