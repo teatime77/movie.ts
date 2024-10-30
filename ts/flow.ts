@@ -56,12 +56,17 @@ async function speakAndHighlight(shape : AbstractShape, speech : Speech, text : 
 export async function play() {
     const speech = new Speech();
 
-    const named_all_shape_map = new Map<string, plane_ts.Shape>();
     const all_shapes = View.current.allShapes();
+    all_shapes.forEach(x => x.hide());
+
     const named_all_shapes = all_shapes.filter(x => x.name != "");
+    const named_all_shape_map = new Map<string, plane_ts.Shape>();
+
     named_all_shapes.forEach(x => named_all_shape_map.set(x.name, x));
 
     for(const shape of View.current.shapes){
+        shape.allShapes().forEach(x => x.show());
+
         if(shape.mute){
             continue;
         }
@@ -130,7 +135,7 @@ export async function play() {
                 if(shape.texUI == undefined){
                     shape.texUI = shape.makeTexUI();
                 }
-                
+
                 div  = shape.texUI.div;
             }
             try{
