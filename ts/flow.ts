@@ -17,6 +17,7 @@ const isLetterOrAt = parser_ts.isLetterOrAt;
 
 const parseMath = parser_ts.parseMath;
 
+const Plane = plane_ts.Plane;
 const View = plane_ts.View;
 
 type Shape = plane_ts.Shape;
@@ -57,6 +58,8 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, text : str
 }
 
 export async function play() {
+    Plane.one.isPlaying = true;
+
     const speech = new Speech();
 
     const all_shapes = View.current.allShapes();
@@ -67,7 +70,19 @@ export async function play() {
 
     named_all_shapes.forEach(x => named_all_shape_map.set(x.name, x));
 
-    for(const shape of View.current.shapes){
+
+    const shape_stack : MathEntity[] = [];
+    while(View.current.shapes.length != 0){
+        const shape = View.current.shapes.pop()!;
+        shape.hide();
+        shape_stack.push(shape);
+    }
+
+    while(shape_stack.length != 0){
+        const shape = shape_stack.pop()!;
+        shape.show();
+        View.current.shapes.push(shape);
+
         shape.allShapes().forEach(x => x.show());
 
         if(shape.mute){
@@ -160,6 +175,7 @@ export async function play() {
         all_shapes.forEach(x => {x.setMode(Mode.none); });
     }
     
+    Plane.one.isPlaying = false;
 }
 
 }
