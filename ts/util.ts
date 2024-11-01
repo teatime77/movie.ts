@@ -32,7 +32,7 @@ export function $sel(id : string) : HTMLSelectElement {
 
 export class MyError extends Error {
     constructor(text : string = ""){
-        super();
+        super(text);
     }
 }
 
@@ -84,8 +84,10 @@ export async function includeDialog(url : string){
 
 
 export async function sleep(milliseconds : number) : Promise<void> {
+    msg(`sleep:${milliseconds}`);
     return new Promise((resolve) => {
         setTimeout(()=>{
+            msg(`sleep end`);
             resolve();
         }, milliseconds);
     });
