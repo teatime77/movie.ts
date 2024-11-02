@@ -43,6 +43,13 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
                             })
                             ,
                             $button({
+                                text : "play all",
+                                click : async (ev:MouseEvent)=>{
+                                    await playAll();
+                                }
+                            })
+                            ,
+                            $button({
                                 text : "Back up",
                                 click : async (ev:MouseEvent)=>{
                                     await firebase_ts.BackUp(1);
@@ -138,7 +145,14 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, show_
                             layout_ts.Log.show(ev);
                         }
                     })
-                ],
+                    ,
+                    $button({
+                        text : "play all",
+                        click : async (ev:MouseEvent)=>{
+                            await playAll();
+                        }
+                    })
+        ],
                 backgroundColor : "violet",
             })
             ,

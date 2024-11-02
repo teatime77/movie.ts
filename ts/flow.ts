@@ -178,4 +178,18 @@ export async function play() {
     Plane.one.isPlaying = false;
 }
 
+
+export async function playAll(){
+    type  DbDoc = firebase_ts.DbDoc;
+    const DbDoc = firebase_ts.DbDoc;
+
+    const items = await firebase_ts.getAllDbItems();
+    const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
+    
+    for(const db_doc of db_docs){
+        const doc = await readDoc(db_doc.id);
+        await play();
+    }
+}
+
 }

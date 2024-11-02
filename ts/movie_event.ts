@@ -60,7 +60,7 @@ export async function bodyOnLoad(){
     msg(`navigator:${navigator.appVersion}`);
 }
 
-async function readDoc(id : number) {
+export async function readDoc(id : number) {
     msg(`id:${id}`);
     theDoc = await firebase_ts.getDoc(id);
     if(theDoc != undefined){
