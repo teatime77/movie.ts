@@ -1,5 +1,7 @@
 namespace movie_ts {
 //
+const TT = i18n_ts.TT;
+
 type Block = layout_ts.Block;
 type Button = layout_ts.Button;
 const Statement = plane_ts.Statement;
@@ -52,7 +54,20 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
                             $button({
                                 text : "Back up",
                                 click : async (ev:MouseEvent)=>{
-                                    await firebase_ts.BackUp(1);
+                                    if(confirm(TT("Do you want to start the backup?"))){
+
+                                        await firebase_ts.BackUp(1);
+                                    }
+                                }
+                            })
+                            ,
+                            $button({
+                                text : "convert",
+                                click : async (ev:MouseEvent)=>{
+                                    if(confirm(TT("Do you want to start the conversion?"))){
+
+                                        await convert();
+                                    }
                                 }
                             })
                             ,

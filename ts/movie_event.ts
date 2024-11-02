@@ -1,7 +1,7 @@
 namespace movie_ts {
 //
 
-let theDoc : firebase_ts.DbDoc | undefined;
+export let theDoc : firebase_ts.DbDoc | undefined;
 export let root : layout_ts.Grid;
 
 const $button = layout_ts.$button;
@@ -115,6 +115,11 @@ export async function putNewDoc(){
 }
 
 export async function updateDoc(){
+    const user = firebase_ts.getUser();
+    if(user == null){
+        throw new MyError();
+    }
+
     if(theDoc == undefined){
         alert("no document");
         return;
@@ -132,7 +137,7 @@ export async function updateDoc(){
 
     theDoc.setName(name);
     theDoc.text = json;
-    theDoc.updateDocDB();
+    theDoc.updateDocDB(user.uid);
 }
 
 export function SignUp(){

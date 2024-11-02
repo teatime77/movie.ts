@@ -1,3 +1,6 @@
+type  DbDoc = firebase_ts.DbDoc;
+const DbDoc = firebase_ts.DbDoc;
+
 type Term = parser_ts.Term;
 const Term = parser_ts.Term;
 
@@ -180,15 +183,38 @@ export async function play() {
 
 
 export async function playAll(){
-    type  DbDoc = firebase_ts.DbDoc;
-    const DbDoc = firebase_ts.DbDoc;
 
     const items = await firebase_ts.getAllDbItems();
     const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
     
     for(const db_doc of db_docs){
-        const doc = await readDoc(db_doc.id);
+        await readDoc(db_doc.id);
         await play();
+    }
+}
+
+export async function convert(){
+    const user = firebase_ts.getUser();
+    if(user == null){
+        throw new MyError();
+    }
+
+    const items = await firebase_ts.getAllDbItems();
+    const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
+    
+    for(const db_doc of db_docs){
+        await readDoc(db_doc.id);
+        if(theDoc == undefined){
+            throw new MyError();
+        }
+
+        theDoc.text = plane_ts.View.getJson();
+        if(theDoc.text == ""){
+            return;
+        }
+    
+        msg(`convert:${theDoc.name} [${theDoc.text}]`);
+        theDoc.updateDocDB("2");    
     }
 }
 
