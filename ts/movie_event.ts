@@ -81,12 +81,16 @@ function inputDocName(default_name : string) : string {
 }
 
 export async function putNewDoc(){
+    let default_name = "";
+
     if(theDoc != undefined){
-        alert("document is already read.");
-        return;
+        if(!confirm("document is already read.\nSave as another file?")){
+            return;
+        }
+        default_name = theDoc.name;
     }
 
-    const name = inputDocName("");
+    const name = inputDocName(default_name);
     if(name == ""){
         return;
     }
@@ -95,6 +99,7 @@ export async function putNewDoc(){
     if(json == ""){
         return;
     }
+    msg(`json:[${json}]`);
 
     const root_folder = await firebase_ts.getRootFolder();
     if(root_folder == null){
