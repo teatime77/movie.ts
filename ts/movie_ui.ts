@@ -13,7 +13,7 @@ const $button = layout_ts.$button;
 
 export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_contents_button : Button) : layout_ts.Grid {
     const root = $grid({
-        rows     : "25px 25px 100% 25px",
+        rows     : "25px 25px 100% 40px",
         children:[
             $block({
                 id : "language-bar",

@@ -53,11 +53,17 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, text : str
 
     for(const dep of shape.dependencies()){
         dep.setMode(Mode.depend);
-        await sleep(0.5 * 1000 * shape.interval);
+
+        if(! Plane.one.isPlayingAll){
+            await sleep(0.5 * 1000 * shape.interval);
+        }
     }
 
     shape.setMode(Mode.target);
-    await sleep(1000 * shape.interval);
+
+    if(! Plane.one.isPlayingAll){
+        await sleep(1000 * shape.interval);
+    }
 }
 
 export async function play() {
@@ -183,14 +189,17 @@ export async function play() {
 
 
 export async function playAll(){
-
     const items = await firebase_ts.getAllDbItems();
     const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
     
+    Plane.one.isPlayingAll = true;
+
     for(const db_doc of db_docs){
         await readDoc(db_doc.id);
         await play();
     }
+
+    Plane.one.isPlayingAll = false;
 }
 
 export async function convert(){
