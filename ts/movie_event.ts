@@ -65,7 +65,7 @@ export async function readDoc(id : number) {
     theDoc = await firebase_ts.getDoc(id);
     if(theDoc != undefined){
 
-        msg(`read doc:${theDoc.id} ${theDoc.name}`)
+        // msg(`read doc:${theDoc.id} ${theDoc.name}`)
         const obj = JSON.parse(theDoc.text);
         plane_ts.loadData(obj);
     }

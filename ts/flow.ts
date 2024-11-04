@@ -215,7 +215,10 @@ export async function convert(){
     
         msg(`convert:${theDoc.name} [${theDoc.text}]`);
         theDoc.updateDocDB("2");    
+        // theDoc.updateDocDB(user.uid);    
     }
+
+    msg("convert finished.")
 }
 
 }
