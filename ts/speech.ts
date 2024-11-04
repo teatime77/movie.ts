@@ -93,7 +93,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
         const uttr = new SpeechSynthesisUtterance(text);
         if(Plane.one.isPlayingAll){
 
-            uttr.rate = 10;
+            uttr.rate = 100;
         }
 
         uttr.addEventListener("end", this.onEnd.bind(this));
