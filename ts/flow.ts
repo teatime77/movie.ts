@@ -159,11 +159,11 @@ export async function play() {
             else{
 
                 text = shape.mathText;
-                if(shape.texUI == undefined){
-                    shape.texUI = shape.makeTexUI();
+                if(shape.latexBox == undefined){
+                    shape.latexBox = shape.makeTexUI();
                 }
 
-                div  = shape.texUI.div;
+                div  = shape.latexBox.div;
             }
             try{
     

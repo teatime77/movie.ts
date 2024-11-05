@@ -13,7 +13,7 @@ const $button = layout_ts.$button;
 
 export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_contents_button : Button) : layout_ts.Grid {
     const root = $grid({
-        rows     : "25px 25px 100% 40px",
+        rows     : "25px 25px 100% 40px 80px",
         children:[
             $block({
                 id : "language-bar",
@@ -107,6 +107,8 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
             })
             ,
             plane.shapes_block
+            ,
+            plane.narration_box
         ]
     });
 
@@ -117,24 +119,33 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, show_
     let content_grid : layout_ts.Grid;
     if(window.innerHeight < window.innerWidth ){
         content_grid = $grid({
-            columns  : "50% 50%",
-
+            rows : "100% 80px",
             children : [
-                plane.text_block
+                $grid({
+                    columns  : "50% 50%",
+
+                    children : [
+                        plane.text_block
+                        ,
+                        plane.canvas_block
+                    ]        
+                })
                 ,
-                plane.canvas_block
+                plane.narration_box
             ]
         })
     }
     else{
 
         content_grid = $grid({
-            rows  : "50% 50%",
+            rows  : "50% 50% 40px",
 
             children : [
                 plane.canvas_block
                 ,
                 plane.text_block
+                ,
+                plane.narration_box
             ]
         })
     }

@@ -87,6 +87,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
     speak(text : string) : void {
         this.initVoice();
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);
+        Plane.one.narration_box.setText(text);
 
         this.prevCharIndex = 0;
     
