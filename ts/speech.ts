@@ -150,7 +150,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
     waitEnd() : Promise<void> {
         return new Promise((resolve) => {
             const id = setInterval(()=>{
-                if(! this.speaking){
+                if(stopPlayFlag || ! this.speaking){
                     clearInterval(id);
                     resolve();
                 }

@@ -35,6 +35,7 @@ const Mode = plane_ts.Mode;
 
 namespace movie_ts {
 //
+export let stopPlayFlag : boolean = false;
 
 function addTexDiv(){
     const div = document.createElement("div");
@@ -68,6 +69,7 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, text : str
 
 export async function play() {
     Plane.one.isPlaying = true;
+    stopPlayFlag = false;
 
     const speech = new Speech();
 
@@ -79,16 +81,15 @@ export async function play() {
 
     named_all_shapes.forEach(x => named_all_shape_map.set(x.name, x));
 
+    const view_shapes = View.current.shapes.slice();
+    View.current.shapes = [];
 
-    const shape_stack : MathEntity[] = [];
-    while(View.current.shapes.length != 0){
-        const shape = View.current.shapes.pop()!;
-        shape.hide();
-        shape_stack.push(shape);
-    }
+    for(const shape of view_shapes){
+        if(stopPlayFlag){
+            msg("stop play");
+            break;
+        }
 
-    while(shape_stack.length != 0){
-        const shape = shape_stack.pop()!;
         shape.show();
         View.current.shapes.push(shape);
 
@@ -183,10 +184,17 @@ export async function play() {
 
         all_shapes.forEach(x => {x.setMode(Mode.none); });
     }
+
+    View.current.shapes = view_shapes;
+    all_shapes.forEach(x => {x.show(); x.setMode(Mode.none); });
     
     Plane.one.isPlaying = false;
 }
 
+export function stopPlay(){
+    cancelSpeech();
+    stopPlayFlag = true;
+}
 
 export async function playAll(){
     const items = await firebase_ts.getAllDbItems();

@@ -11,7 +11,7 @@ const $grid = layout_ts.$grid;
 const $block = layout_ts.$block;
 const $button = layout_ts.$button;
 
-export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_contents_button : Button) : layout_ts.Grid {
+export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_button : Button, show_contents_button : Button) : layout_ts.Grid {
     const root = $grid({
         rows     : "25px 25px 100% 40px 80px",
         children:[
@@ -29,6 +29,8 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
                     $flex({
                         children : [
                             play_button
+                            ,
+                            stop_button
                             ,
                             $button({
                                 text : "new doc",
@@ -115,7 +117,7 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, show_
     return root;    
 }
 
-export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, show_contents_button : Button) : layout_ts.Grid {
+export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_button : Button, show_contents_button : Button) : layout_ts.Grid {
     let content_grid : layout_ts.Grid;
     if(window.innerHeight < window.innerWidth ){
         content_grid = $grid({
@@ -162,6 +164,8 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, show_
             $flex({
                 children : [
                     play_button
+                    ,
+                    stop_button
                     ,
                     show_contents_button
                     ,

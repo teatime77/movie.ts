@@ -18,10 +18,16 @@ export async function bodyOnLoad(){
     let root : layout_ts.Grid;
 
     const play_button = $button({
-        id : "movie-play",
         text : "Play",
         click : async (ev : MouseEvent)=>{
             await play();
+        }
+    });
+
+    const stop_button = $button({
+        text : "Stop",
+        click : async (ev : MouseEvent)=>{
+            stopPlay();
         }
     });
 
@@ -35,10 +41,10 @@ export async function bodyOnLoad(){
 
     if(edit_mode){
 
-        root = makeEditGrid(plane, play_button, show_contents_button);
+        root = makeEditGrid(plane, play_button, stop_button, show_contents_button);
     }
     else{
-        root = makePlayGrid(plane, play_button, show_contents_button);
+        root = makePlayGrid(plane, play_button, stop_button, show_contents_button);
     }
 
     layout_ts.initLayout(root);
