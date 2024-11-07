@@ -95,7 +95,7 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
             })
             ,
             $grid({
-                columns  : "50px 50% 50% 300px",
+                columns  : "72px 50% 50% 300px",
 
                 children : [
                     plane.tool_block

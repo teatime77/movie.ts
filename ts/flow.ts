@@ -26,6 +26,9 @@ const View = plane_ts.View;
 type Shape = plane_ts.Shape;
 const Shape = plane_ts.Shape;
 
+type Motion = plane_ts.Motion;
+const Motion = plane_ts.Motion;
+
 type MathEntity = plane_ts.MathEntity;
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
@@ -71,6 +74,8 @@ export async function play() {
     Plane.one.isPlaying = true;
     stopPlayFlag = false;
 
+    View.current.restoreView();
+
     const speech = new Speech();
 
     const all_shapes = View.current.allShapes();
@@ -101,7 +106,10 @@ export async function play() {
 
         let highlighted = new Set<Reading>();
 
-        if(shape.narration != ""){
+        if(shape instanceof Motion){
+            await shape.animate(speech);
+        }
+        else if(shape.narration != ""){
 
             await speakAndHighlight(shape, speech, shape.narration);
         }
@@ -186,8 +194,14 @@ export async function play() {
     }
 
     View.current.shapes = view_shapes;
+
+    View.current.restoreView();
+
     all_shapes.forEach(x => {x.show(); x.setMode(Mode.none); });
-    
+
+    View.current.dirty = true;
+    View.current.updateShapes();
+
     Plane.one.isPlaying = false;
 }
 
