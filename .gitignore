@@ -2,6 +2,7 @@ public/katex
 .vscode/settings.json
 ts/@types
 public/lib/i18n
+public/lib/media
 public/lib/firebase
 public/lib/parser
 public/lib/layout

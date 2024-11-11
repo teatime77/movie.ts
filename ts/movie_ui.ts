@@ -13,7 +13,7 @@ const $button = layout_ts.$button;
 
 export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_button : Button, show_contents_button : Button) : layout_ts.Grid {
     const root = $grid({
-        rows     : "25px 25px 100% 40px 80px",
+        rows     : "25px 25px 864px",
         children:[
             $block({
                 id : "language-bar",
@@ -28,6 +28,8 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
                     ,
                     $flex({
                         children : [
+                            show_contents_button
+                            ,
                             play_button
                             ,
                             stop_button
@@ -80,8 +82,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
                                 }
                             })
                             ,
-                            show_contents_button
-                            ,
                             $button({
                                 text : "log",
                                 click : async (ev:MouseEvent)=>{
@@ -95,22 +95,26 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
             })
             ,
             $grid({
-                columns  : "72px 50% 50% 300px",
+                columns  : "72px 486px 40px 300px",
 
                 children : [
                     plane.tool_block
                     ,
-                    plane.text_block
+                    $grid({
+                        id : "canvas-narration",
+                        rows  : "486px 378px",
+                        children : [
+                            plane.canvas_block
+                            ,
+                            plane.narration_box        
+                        ]
+                    })
                     ,
-                    plane.canvas_block
+                    plane.shapes_block
                     ,
                     plane.property_block
                 ]
             })
-            ,
-            plane.shapes_block
-            ,
-            plane.narration_box
         ]
     });
 
@@ -119,33 +123,31 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
 
 export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_button : Button, show_contents_button : Button) : layout_ts.Grid {
     let content_grid : layout_ts.Grid;
-    if(window.innerHeight < window.innerWidth ){
+    const horizontal = false;
+    if(horizontal){
         content_grid = $grid({
-            rows : "100% 80px",
             children : [
                 $grid({
                     columns  : "50% 50%",
 
                     children : [
-                        plane.text_block
+                        plane.narration_box
                         ,
                         plane.canvas_block
                     ]        
                 })
-                ,
-                plane.narration_box
             ]
         })
     }
     else{
 
         content_grid = $grid({
-            rows  : "50% 50% 40px",
-
+            id : "canvas-narration",
+            rows  : "486px 378px",
+            borderStyle : "ridge",
+            borderWidth : 3,
             children : [
                 plane.canvas_block
-                ,
-                plane.text_block
                 ,
                 plane.narration_box
             ]
@@ -153,7 +155,8 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
     }
     
     const root = $grid({
-        rows     : "25px 25px 100% 25px",
+        width : "486px",
+        rows     : "25px 25px 864px",
         children:[
             $block({
                 id : "language-bar",
@@ -163,11 +166,11 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
             ,
             $flex({
                 children : [
+                    show_contents_button
+                    ,
                     play_button
                     ,
                     stop_button
-                    ,
-                    show_contents_button
                     ,
                     $button({
                         text : "log",
@@ -182,11 +185,17 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
                             await playAll();
                         }
                     })
-        ],
+                ]
+                ,
                 backgroundColor : "violet",
             })
             ,
-            content_grid
+            $grid({
+                columns : "486px",
+                children : [
+                    content_grid
+                ]
+            })
         ]
     });
 
