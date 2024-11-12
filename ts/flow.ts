@@ -88,6 +88,10 @@ export async function play() {
 
     const view_shapes = View.current.shapes.slice();
     View.current.shapes = [];
+    View.current.dirty = true;
+
+    Plane.one.clearPlane();
+    await sleep(2000);
 
     for(const shape of view_shapes){
         if(stopPlayFlag){
@@ -192,6 +196,10 @@ export async function play() {
 
         all_shapes.forEach(x => {x.setMode(Mode.none); });
     }
+
+    View.current.dirty = true;
+    await sleep(2000);
+    Plane.one.clearPlane();
 
     View.current.shapes = view_shapes;
 
