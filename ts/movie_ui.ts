@@ -144,8 +144,6 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
         content_grid = $grid({
             id : "canvas-narration",
             rows  : "486px 378px",
-            borderStyle : "ridge",
-            borderWidth : 3,
             children : [
                 plane.canvas_block
                 ,

@@ -53,7 +53,9 @@ export async function playStatement(statement : Statement, speech : Speech) {
 }
 
 async function speakAndHighlight(shape : MathEntity, speech : Speech, text : string){
-    speech.speak(text);
+    const lines = text.split("\n");
+
+    speech.speak(lines.shift()!.trim());
 
     for(const dep of shape.dependencies()){
         dep.setMode(Mode.depend);
@@ -64,6 +66,14 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, text : str
     }
 
     shape.setMode(Mode.target);
+
+    while(lines.length != 0){
+        const line = lines.shift()!.trim();
+        if(line != ""){
+            await speech.waitEnd();
+            speech.speak(line);
+        }
+    }
 
     if(! Plane.one.isPlayingAll){
         await sleep(1000 * shape.interval);
@@ -90,7 +100,7 @@ export async function play() {
     View.current.shapes = [];
     View.current.dirty = true;
 
-    Plane.one.clearPlane();
+    Plane.one.clearNarrationBox();
     await sleep(2000);
 
     for(const shape of view_shapes){
@@ -199,7 +209,6 @@ export async function play() {
 
     View.current.dirty = true;
     await sleep(2000);
-    Plane.one.clearPlane();
 
     View.current.shapes = view_shapes;
 
