@@ -157,6 +157,11 @@ export class Speech extends i18n_ts.AbstractSpeech {
             }, 10);
         });
     }
+
+    async speak_waitEnd(text : string){
+        this.speak(text);
+        await this.waitEnd();
+    }
 }
 
 export function pronunciation(word: string) : string[]{

@@ -23,6 +23,9 @@ const parseMath = parser_ts.parseMath;
 const Plane = plane_ts.Plane;
 const View = plane_ts.View;
 
+type Reason = plane_ts.Reason;
+const Reason = plane_ts.Reason;
+
 type Shape = plane_ts.Shape;
 const Shape = plane_ts.Shape;
 
@@ -30,9 +33,16 @@ type Motion = plane_ts.Motion;
 const Motion = plane_ts.Motion;
 
 type MathEntity = plane_ts.MathEntity;
+
+const TriangleCongruence = plane_ts.TriangleCongruence;
+type TriangleCongruence = plane_ts.TriangleCongruence;
+
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
+
 const TextBlock = plane_ts.TextBlock;
+type SelectedShape = plane_ts.SelectedShape;
+const SelectedShape = plane_ts.SelectedShape;
 
 const Mode = plane_ts.Mode;
 
@@ -58,12 +68,17 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, text : str
     speech.speak(lines.shift()!.trim());
 
     for(const dep of shape.dependencies()){
+        if(dep instanceof SelectedShape){
+            View.current.attentionShapes.push(dep);
+        }
+        
         dep.setMode(Mode.depend);
 
         if(! Plane.one.isPlayingAll){
             await sleep(0.5 * 1000 * shape.interval);
         }
     }
+
 
     shape.setMode(Mode.target);
 
@@ -120,7 +135,11 @@ export async function play() {
 
         let highlighted = new Set<Reading>();
 
-        if(shape instanceof Motion){
+
+        if(shape instanceof TriangleCongruence){
+            await shape.asyncPlay(speech);
+        }
+        else if(shape instanceof Motion){
             await shape.animate(speech);
         }
         else if(shape.narration != ""){
@@ -204,6 +223,7 @@ export async function play() {
             }
         }
 
+        View.current.attentionShapes = [];
         all_shapes.forEach(x => {x.setMode(Mode.none); });
     }
 
