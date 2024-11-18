@@ -41,8 +41,13 @@ const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
 
 const TextBlock = plane_ts.TextBlock;
+type  TextBlock = plane_ts.TextBlock;
+
 type SelectedShape = plane_ts.SelectedShape;
 const SelectedShape = plane_ts.SelectedShape;
+
+const PlayMode = plane_ts.PlayMode;
+type  PlayMode = plane_ts.PlayMode;
 
 const Mode = plane_ts.Mode;
 
@@ -74,7 +79,7 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, text : str
         
         dep.setMode(Mode.depend);
 
-        if(! Plane.one.isPlayingAll){
+        if(Plane.one.playMode == PlayMode.normal){
             await sleep(0.5 * 1000 * shape.interval);
         }
     }
@@ -90,13 +95,46 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, text : str
         }
     }
 
-    if(! Plane.one.isPlayingAll){
+    if(Plane.one.playMode == PlayMode.normal){
         await sleep(1000 * shape.interval);
     }
 }
 
-export async function play() {
-    Plane.one.isPlaying = true;
+async function generateTex(shape : TextBlock | Statement, speech : Speech, named_all_shape_map : Map<string, plane_ts.Shape>) {
+    let text : string;
+    let div  : HTMLDivElement;
+
+    if(shape instanceof TextBlock){
+        text = shape.text;
+        div  = shape.div;
+    }
+    else{
+
+        text = shape.mathText;
+        if(shape.latexBox == undefined){
+            shape.latexBox = shape.makeTexUI();
+        }
+
+        div  = shape.latexBox.div;
+    }
+    try{
+
+        const term = parseMath(text);
+
+        await doGenerator( parser_ts.showFlow(speech, term, div, named_all_shape_map), 1 );
+
+    }
+    catch(e){
+        if(e instanceof parser_ts.SyntaxError){
+            return;
+        }
+
+        throw e;
+    }
+}
+
+export async function play(play_mode : PlayMode) {
+    Plane.one.playMode = play_mode;
     stopPlayFlag = false;
 
     View.current.restoreView();
@@ -116,7 +154,11 @@ export async function play() {
     View.current.dirty = true;
 
     Plane.one.clearNarrationBox();
-    await sleep(2000);
+    if(Plane.one.playMode != PlayMode.playAll){
+        await sleep(2000);
+    }
+
+    // media_ts.startAudioRecorder();
 
     for(const shape of view_shapes){
         if(stopPlayFlag){
@@ -134,7 +176,6 @@ export async function play() {
         }
 
         let highlighted = new Set<Reading>();
-
 
         if(shape instanceof TriangleCongruence){
             await shape.asyncPlay(speech);
@@ -191,44 +232,19 @@ export async function play() {
 
         if(shape instanceof TextBlock && shape.isTex || shape instanceof Statement && shape.mathText != ""){
 
-            let text : string;
-            let div  : HTMLDivElement;
-
-            if(shape instanceof TextBlock){
-                text = shape.text;
-                div  = shape.div;
-            }
-            else{
-
-                text = shape.mathText;
-                if(shape.latexBox == undefined){
-                    shape.latexBox = shape.makeTexUI();
-                }
-
-                div  = shape.latexBox.div;
-            }
-            try{
-    
-                const term = parseMath(text);
-
-                await doGenerator( parser_ts.showFlow(speech, term, div, named_all_shape_map), 1 );
-
-            }
-            catch(e){
-                if(e instanceof parser_ts.SyntaxError){
-                    return;
-                }
-    
-                throw e;
-            }
+            await generateTex(shape, speech, named_all_shape_map);
         }
 
         View.current.attentionShapes = [];
         all_shapes.forEach(x => {x.setMode(Mode.none); });
     }
 
+    // media_ts.stopAudioRecorder();
+
     View.current.dirty = true;
-    await sleep(2000);
+    if(Plane.one.playMode != PlayMode.playAll){
+        await sleep(2000);
+    }
 
     View.current.shapes = view_shapes;
 
@@ -239,7 +255,7 @@ export async function play() {
     View.current.dirty = true;
     View.current.updateShapes();
 
-    Plane.one.isPlaying = false;
+    Plane.one.playMode = PlayMode.stop;
 }
 
 export function stopPlay(){
@@ -251,14 +267,10 @@ export async function playAll(){
     const items = await firebase_ts.getAllDbItems();
     const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
     
-    Plane.one.isPlayingAll = true;
-
     for(const db_doc of db_docs){
         await readDoc(db_doc.id);
-        await play();
+        await play(PlayMode.playAll);
     }
-
-    Plane.one.isPlayingAll = false;
 }
 
 export async function convert(){

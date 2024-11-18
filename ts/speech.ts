@@ -1,5 +1,7 @@
 namespace movie_ts{
 
+const PlayMode = plane_ts.PlayMode;
+
 const voiceMap = new Map<string, SpeechSynthesisVoice[]>();
 
 const langCodeMap = new Map<string, string>([
@@ -24,7 +26,9 @@ const voiceNamesDic : { [lang: string]: string[] } = {
     ]
     ,
     "en-US" : [
-        "Microsoft Ava Online (Natural) - English (United States)"
+        "Microsoft Ava Online (Natural) - English (United States)",
+        "Google US English",
+        "Microsoft Zira - English (United States)"
     ]
 };
 
@@ -84,6 +88,40 @@ export class Speech extends i18n_ts.AbstractSpeech {
         }
     }
 
+    emulate(text : string, uttr : SpeechSynthesisUtterance){
+        let charIndex = 0;
+
+        const id = setInterval(()=>{
+            if(this.voice!.lang == "ja-JP"){
+                charIndex++;
+            }
+            else{
+
+                charIndex = text.indexOf(" ", charIndex);
+                if(charIndex == -1){
+                    charIndex = text.length;
+                }
+                else{
+                    charIndex++;
+                }
+            }
+
+            const ev : any = {
+                utterance : uttr,
+                charIndex : charIndex,
+                name : "word",
+                type : "boundary"
+            };
+
+            this.onBoundary(ev as SpeechSynthesisEvent);
+
+            if(text.length <= charIndex){
+                this.onEnd(ev as SpeechSynthesisEvent);
+                clearInterval(id);
+            }
+        }, 1);
+    }
+
     speak(text : string) : void {
         this.initVoice();
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);
@@ -92,10 +130,6 @@ export class Speech extends i18n_ts.AbstractSpeech {
         this.prevCharIndex = 0;
     
         const uttr = new SpeechSynthesisUtterance(text);
-        if(Plane.one.isPlayingAll){
-
-            uttr.rate = 100;
-        }
 
         uttr.addEventListener("end", this.onEnd.bind(this));
         uttr.addEventListener("boundary", this.onBoundary.bind(this));
@@ -108,7 +142,16 @@ export class Speech extends i18n_ts.AbstractSpeech {
             uttr.voice = this.voice;
         }
 
-        speechSynthesis.speak(uttr);
+        if(Plane.one.playMode == PlayMode.playAll){
+
+            uttr.rate = 100;
+            this.emulate(text, uttr);
+        }
+        else{
+
+            speechSynthesis.speak(uttr);
+        }   
+
         this.speaking = true;
     }
 
@@ -200,7 +243,10 @@ function setVoiceList(){
     }
 
     for(const voice of voices){
-        // msg(`voice lang:${voice.lang} name:${voice.name}`);
+        if(voice.lang == "en-US"){
+
+            msg(`voice lang:[${voice.lang}] name:[${voice.name}]`);
+        }
 
         let voice_lang = voice.lang.replaceAll("_", "-");
         const k = voice_lang.indexOf("-#");

@@ -6,6 +6,8 @@ export let root : layout_ts.Grid;
 
 const $button = layout_ts.$button;
 
+const PlayMode = plane_ts.PlayMode;
+
 export async function bodyOnLoad(){
     const [ origin, pathname, params] = i18n_ts.parseURL();
     msg(`params:${JSON.stringify(params) }`);
@@ -20,7 +22,7 @@ export async function bodyOnLoad(){
     const play_button = $button({
         text : "Play",
         click : async (ev : MouseEvent)=>{
-            await play();
+            await play(PlayMode.normal);
         }
     });
 
