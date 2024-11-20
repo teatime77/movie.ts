@@ -16,13 +16,14 @@ const langCodeMap = new Map<string, string>([
     ["kor", "ko-KR"],
     ["rus", "ru-RU"],
     ["spa", "es-ES"],
+    ["por", "pt-PT"],
 ]);
 
 const voiceNamesDic : { [lang: string]: string[] } = {
     "ja-JP" : [
         "Microsoft Nanami Online (Natural) - Japanese (Japan)",
-        "Microsoft Ayumi - Japanese (Japan)",
-        "Google 日本語"
+        "Google 日本語",
+        "Microsoft Ayumi - Japanese (Japan)"
     ]
     ,
     "en-US" : [
@@ -32,20 +33,21 @@ const voiceNamesDic : { [lang: string]: string[] } = {
     ]
 };
 
+let languageRegion : string;
+
 function getVoiceByLangCode(lang_code : string) : SpeechSynthesisVoice | undefined {
-    const language_region = langCodeMap.get(lang_code);
-    if(language_region == undefined){
-        msg(`unknown lang code:${lang_code}`);
-        return undefined;
+    languageRegion = langCodeMap.get(lang_code)!;
+    if(languageRegion == undefined){
+        throw new MyError(`unknown lang code:${lang_code}`);
     }
 
-    const voices = voiceMap.get(language_region);
+    const voices = voiceMap.get(languageRegion);
     if(voices == undefined){
-        msg(`no voice for ${language_region}`);
+        msg(`no voice for ${languageRegion}`);
         return undefined;
     }
 
-    const default_names = voiceNamesDic[language_region];
+    const default_names = voiceNamesDic[languageRegion];
     if(default_names != undefined){
         for(const name of default_names){
             const voice = voices.find(x => x.name == name);
@@ -65,6 +67,7 @@ function getVoiceByLangCode(lang_code : string) : SpeechSynthesisVoice | undefin
 
 export class Speech extends i18n_ts.AbstractSpeech {
     voice? : SpeechSynthesisVoice;
+    text!   : string;
 
     constructor(){ 
         super();
@@ -83,7 +86,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
 
             this.voice = getVoiceByLangCode(i18n_ts.languageCode);
             if(this.voice != undefined){
-                msg(`use voice:${this.voice.name}`);
+                // msg(`use voice:${this.voice.name}`);
             }
         }
     }
@@ -123,6 +126,8 @@ export class Speech extends i18n_ts.AbstractSpeech {
     }
 
     speak(text : string) : void {
+        this.text = text;
+
         this.initVoice();
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);
         Plane.one.narration_box.setText(text);
@@ -163,14 +168,14 @@ export class Speech extends i18n_ts.AbstractSpeech {
     }
 
     onBoundary(ev: SpeechSynthesisEvent) : void {
-        const text = ev.utterance.text.substring(this.prevCharIndex, ev.charIndex).trim();
+        const text = this.text.substring(this.prevCharIndex, ev.charIndex).trim();
         if(ev.charIndex == 0){
 
-            msg(`Speech start name:${ev.name} text:[${ev.utterance.text}]`)
+            msg(`Speech start name:${ev.name} text:[${this.text}]`)
         }
         else{
     
-            msg(`Speech bdr: idx:${ev.charIndex} name:${ev.name} type:${ev.type} text:[${text}]`);
+            // msg(`Speech bdr: idx:${ev.charIndex} name:${ev.name} type:${ev.type} text:[${text}]`);
         }
         if(this.callback != undefined){
             this.callback(ev.charIndex);
@@ -180,9 +185,9 @@ export class Speech extends i18n_ts.AbstractSpeech {
     }
 
     onEnd(ev: SpeechSynthesisEvent) : void {
-        msg(`Speech end: idx:${ev.charIndex} name:${ev.name} type:${ev.type} text:[${ev.utterance.text.substring(this.prevCharIndex)}]`);
+        // msg(`Speech end: idx:${ev.charIndex} name:${ev.name} type:${ev.type} text:[${this.text.substring(this.prevCharIndex)}]`);
         if(this.callback != undefined){
-            this.callback(ev.utterance.text.length);
+            this.callback(this.text.length);
         }
         this.speaking = false;
     }
@@ -243,10 +248,10 @@ function setVoiceList(){
     }
 
     for(const voice of voices){
-        if(voice.lang == "en-US"){
+        // if(voice.lang == languageRegion){
 
             msg(`voice lang:[${voice.lang}] name:[${voice.name}]`);
-        }
+        // }
 
         let voice_lang = voice.lang.replaceAll("_", "-");
         const k = voice_lang.indexOf("-#");

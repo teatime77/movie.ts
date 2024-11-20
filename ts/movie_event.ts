@@ -69,7 +69,7 @@ export async function bodyOnLoad(){
 }
 
 export async function readDoc(id : number) {
-    msg(`id:${id}`);
+    // msg(`id:${id}`);
     theDoc = await firebase_ts.getDoc(id);
     if(theDoc != undefined){
 

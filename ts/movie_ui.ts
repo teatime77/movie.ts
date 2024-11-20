@@ -1,6 +1,5 @@
 namespace movie_ts {
 //
-const TT = i18n_ts.TT;
 
 type Block = layout_ts.Block;
 type Button = layout_ts.Button;

@@ -53,6 +53,9 @@ const Mode = plane_ts.Mode;
 
 namespace movie_ts {
 //
+export const TT = i18n_ts.TT;
+export const TTs = i18n_ts.TTs;
+
 export let stopPlayFlag : boolean = false;
 
 function addTexDiv(){
@@ -67,9 +70,7 @@ function addTexDiv(){
 export async function playStatement(statement : Statement, speech : Speech) {
 }
 
-async function speakAndHighlight(shape : MathEntity, speech : Speech, text : string){
-    const lines = text.split("\n");
-
+async function speakAndHighlight(shape : MathEntity, speech : Speech, lines : string[]){
     speech.speak(lines.shift()!.trim());
 
     for(const dep of shape.dependencies()){
@@ -185,7 +186,7 @@ export async function play(play_mode : PlayMode) {
         }
         else if(shape.narration != ""){
 
-            await speakAndHighlight(shape, speech, shape.narration);
+            await speakAndHighlight(shape, speech, TTs(shape.narration));
         }
         else{
 
@@ -195,7 +196,7 @@ export async function play(play_mode : PlayMode) {
             }
             else if(root_reading.args.length == 0){
 
-                await speakAndHighlight(shape, speech, root_reading.text);
+                await speakAndHighlight(shape, speech, [root_reading.text]);
             }
             else{
 
@@ -220,7 +221,7 @@ export async function play(play_mode : PlayMode) {
                 }
 
                 if(text != ""){
-                    speech.speak(text);
+                    speech.speak(TT(text));
                 }                
             }
         }
@@ -266,11 +267,29 @@ export function stopPlay(){
 export async function playAll(){
     const items = await firebase_ts.getAllDbItems();
     const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
+
     
     for(const db_doc of db_docs){
+        const eng_texts_prev = i18n_ts.getEngTexts().slice();
+
         await readDoc(db_doc.id);
         await play(PlayMode.playAll);
+
+        const eng_texts_new = i18n_ts.getEngTexts();
+        if(eng_texts_prev.length < eng_texts_new.length){
+
+            const diff_texts =  Array.from( eng_texts_new.slice(eng_texts_prev.length).entries() ).map(x=>`${x[0]}:${x[1]}`).join("\n\n");
+            msg(`eng texts diff:[${diff_texts}]`);
+        }
     }
+
+    const eng_texts = i18n_ts.getEngTexts();
+    const all_texts =  Array.from( eng_texts.entries() ).map(x=>`${x[0]}:${x[1]}`).join("\n\n");
+
+    msg(`eng texts:[${all_texts}]`);
+
+    ($("lang-texts-text") as HTMLTextAreaElement).value = all_texts;
+    $dlg("lang-texts-dlg").showModal();
 }
 
 export async function convert(){
