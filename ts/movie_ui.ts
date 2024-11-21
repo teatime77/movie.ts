@@ -17,7 +17,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
             $block({
                 id : "language-bar",
                 children : [],
-                backgroundColor : "chocolate",
             })
             ,
             $grid({
@@ -88,7 +87,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
                                 }
                             })
                         ],
-                        backgroundColor : "violet",
                     })
                 ]
             })
@@ -158,7 +156,6 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
             $block({
                 id : "language-bar",
                 children : [],
-                backgroundColor : "chocolate",
             })
             ,
             $flex({
@@ -183,8 +180,6 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
                         }
                     })
                 ]
-                ,
-                backgroundColor : "violet",
             })
             ,
             $grid({

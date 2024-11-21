@@ -9,6 +9,9 @@ const $button = layout_ts.$button;
 const PlayMode = plane_ts.PlayMode;
 
 export async function bodyOnLoad(){
+    document.body.style.color = plane_ts.fgColor;
+    document.body.style.backgroundColor = plane_ts.bgColor;
+
     const [ origin, pathname, params] = i18n_ts.parseURL();
     msg(`params:${JSON.stringify(params) }`);
 
