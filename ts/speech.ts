@@ -110,10 +110,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
             }
 
             const ev : any = {
-                utterance : uttr,
                 charIndex : charIndex,
-                name : "word",
-                type : "boundary"
             };
 
             this.onBoundary(ev as SpeechSynthesisEvent);
@@ -127,10 +124,17 @@ export class Speech extends i18n_ts.AbstractSpeech {
 
     speak(text : string) : void {
         this.text = text;
+        Plane.one.narration_box.setText(text);
+
+        const id = i18n_ts.getIdFromText(this.text);
+        if(id != undefined){
+            this.playAudio(id);
+            return;
+        }
+
 
         this.initVoice();
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);
-        Plane.one.narration_box.setText(text);
 
         this.prevCharIndex = 0;
     
@@ -160,6 +164,40 @@ export class Speech extends i18n_ts.AbstractSpeech {
         this.speaking = true;
     }
 
+    playAudio(id : number){
+        const audio = document.createElement("audio");
+        document.body.append(audio);
+        
+        let can_play_through = false;
+
+        audio.addEventListener("canplaythrough", (ev:Event)=>{
+            msg("can play");
+            can_play_through = true;
+        });
+
+        audio.addEventListener("ended", (ev : Event)=>{
+            msg("audio ended");
+
+            const charIndex = this.text.length;
+            this.onBoundary({ charIndex } as SpeechSynthesisEvent);
+            this.onEnd({} as SpeechSynthesisEvent);
+
+            document.body.removeChild(audio)
+        });
+
+        const audio_path = `${urlOrigin}/lib/i18n/audio/${i18n_ts.languageCode}/${id}.mp3`;
+        msg(`${audio_path}`);
+        audio.src = audio_path;
+        const timer_id = setInterval(()=>{
+            if(can_play_through){
+                clearInterval(timer_id);
+                audio.play();
+            }
+        }, 10);
+
+        this.speaking = true;
+    }
+
     * genSpeak(text : string){
         this.speak(text);
         while(this.speaking){
@@ -171,7 +209,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
         const text = this.text.substring(this.prevCharIndex, ev.charIndex).trim();
         if(ev.charIndex == 0){
 
-            msg(`Speech start name:${ev.name} text:[${this.text}]`)
+            msg(`Speech start text:[${this.text}]`)
         }
         else{
     
@@ -279,7 +317,7 @@ function initSpeechSub(){
         msg("このブラウザは音声合成に対応しています。🎉");
 
         const speech = new Speech();
-        speech.speak("hello");
+        // speech.speak("hello");
     }
     else {
         msg("このブラウザは音声合成に対応していません。😭");

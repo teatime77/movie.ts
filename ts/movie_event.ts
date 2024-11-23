@@ -3,6 +3,7 @@ namespace movie_ts {
 
 export let theDoc : firebase_ts.DbDoc | undefined;
 export let root : layout_ts.Grid;
+export let urlOrigin : string;
 
 const $button = layout_ts.$button;
 
@@ -13,6 +14,7 @@ export async function bodyOnLoad(){
     document.body.style.backgroundColor = plane_ts.bgColor;
 
     const [ origin, pathname, params] = i18n_ts.parseURL();
+    urlOrigin = origin;
     msg(`params:${JSON.stringify(params) }`);
 
     const edit_mode = (params.get("mode") == "edit");
@@ -64,11 +66,19 @@ export async function bodyOnLoad(){
     // await asyncInitSpeech();
     initSpeech();
 
-    firebase_ts.initFirebase();
+    await firebase_ts.initFirebase();
 
     const size = layout_ts.getPhysicalSize();
     msg(`size:${size.width_cm.toFixed(1)} ${size.height_cm.toFixed(1)}`);
     msg(`navigator:${navigator.appVersion}`);
+
+    const doc_id = params.get("id");
+    if(doc_id != undefined){
+
+        const root_folder = await firebase_ts.getRootFolder();
+
+        await readDoc(parseInt(doc_id));
+    }
 }
 
 export async function readDoc(id : number) {
@@ -79,6 +89,8 @@ export async function readDoc(id : number) {
         // msg(`read doc:${theDoc.id} ${theDoc.name}`)
         const obj = JSON.parse(theDoc.text);
         plane_ts.loadData(obj);
+
+        i18n_ts.initLanguageBar($("language-bar"), id);
     }
 }
 

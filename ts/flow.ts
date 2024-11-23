@@ -159,7 +159,8 @@ export async function play(play_mode : PlayMode) {
         await sleep(2000);
     }
 
-    // media_ts.startAudioRecorder();
+    // media_ts.recordAudio();
+    // await media_ts.startAudioRecorder();
 
     for(const shape of view_shapes){
         if(stopPlayFlag){
