@@ -266,6 +266,8 @@ export function stopPlay(){
 }
 
 export async function playAll(){
+    docSpeeches = [];
+
     const items = await firebase_ts.getAllDbItems();
     const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
 
@@ -277,19 +279,14 @@ export async function playAll(){
         await play(PlayMode.playAll);
 
         const eng_texts_new = i18n_ts.getEngTexts();
-        if(eng_texts_prev.length < eng_texts_new.length){
-
-            const diff_texts =  Array.from( eng_texts_new.slice(eng_texts_prev.length).entries() ).map(x=>`${x[0]}:${x[1]}`).join("\n\n");
-            msg(`eng texts diff:[${diff_texts}]`);
-        }
     }
 
     const eng_texts = i18n_ts.getEngTexts();
     const all_texts =  Array.from( eng_texts.entries() ).map(x=>`${x[0]}:${x[1]}`).join("\n\n");
 
-    msg(`eng texts:[${all_texts}]`);
+    const doc_speeches = JSON.stringify(docSpeeches, null, 4);
 
-    ($("lang-texts-text") as HTMLTextAreaElement).value = all_texts;
+    ($("lang-texts-text") as HTMLTextAreaElement).value = doc_speeches;
     $dlg("lang-texts-dlg").showModal();
 }
 

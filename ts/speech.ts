@@ -91,7 +91,23 @@ export class Speech extends i18n_ts.AbstractSpeech {
         }
     }
 
-    emulate(text : string, uttr : SpeechSynthesisUtterance){
+    emulate(speech_id : number | undefined){
+        if(theDoc == undefined){
+            throw new MyError();
+        }
+
+        if(speech_id != undefined){
+
+            let doc_speeches = docSpeeches.find(x => x.docId == theDoc!.id)
+            if(doc_speeches == undefined){
+                doc_speeches
+                docSpeeches.push( { docId:theDoc.id, name : theDoc.name, speechIds : [speech_id]  } );
+            }
+            else{
+                doc_speeches.speechIds.push(speech_id);
+            }
+        }
+
         let charIndex = 0;
 
         const id = setInterval(()=>{
@@ -100,9 +116,9 @@ export class Speech extends i18n_ts.AbstractSpeech {
             }
             else{
 
-                charIndex = text.indexOf(" ", charIndex);
+                charIndex = this.text.indexOf(" ", charIndex);
                 if(charIndex == -1){
-                    charIndex = text.length;
+                    charIndex = this.text.length;
                 }
                 else{
                     charIndex++;
@@ -115,7 +131,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
 
             this.onBoundary(ev as SpeechSynthesisEvent);
 
-            if(text.length <= charIndex){
+            if(this.text.length <= charIndex){
                 this.onEnd(ev as SpeechSynthesisEvent);
                 clearInterval(id);
             }
@@ -123,15 +139,22 @@ export class Speech extends i18n_ts.AbstractSpeech {
     }
 
     speak(text : string) : void {
+        this.speaking = true;
         this.text = text;
         Plane.one.narration_box.setText(text);
 
-        const id = i18n_ts.getIdFromText(this.text);
-        if(id != undefined){
-            this.playAudio(id);
+        const speech_id = i18n_ts.getIdFromText(this.text);
+
+        if(Plane.one.playMode == PlayMode.playAll){
+
+            this.emulate(speech_id);
             return;
         }
 
+        if(speech_id != undefined){
+            playAudio(this, speech_id);
+            return;
+        }
 
         this.initVoice();
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);
@@ -151,51 +174,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
             uttr.voice = this.voice;
         }
 
-        if(Plane.one.playMode == PlayMode.playAll){
-
-            uttr.rate = 100;
-            this.emulate(text, uttr);
-        }
-        else{
-
-            speechSynthesis.speak(uttr);
-        }   
-
-        this.speaking = true;
-    }
-
-    playAudio(id : number){
-        const audio = document.createElement("audio");
-        document.body.append(audio);
-        
-        let can_play_through = false;
-
-        audio.addEventListener("canplaythrough", (ev:Event)=>{
-            msg("can play");
-            can_play_through = true;
-        });
-
-        audio.addEventListener("ended", (ev : Event)=>{
-            msg("audio ended");
-
-            const charIndex = this.text.length;
-            this.onBoundary({ charIndex } as SpeechSynthesisEvent);
-            this.onEnd({} as SpeechSynthesisEvent);
-
-            document.body.removeChild(audio)
-        });
-
-        const audio_path = `${urlOrigin}/lib/i18n/audio/${i18n_ts.languageCode}/${id}.mp3`;
-        msg(`${audio_path}`);
-        audio.src = audio_path;
-        const timer_id = setInterval(()=>{
-            if(can_play_through){
-                clearInterval(timer_id);
-                audio.play();
-            }
-        }, 10);
-
-        this.speaking = true;
+        speechSynthesis.speak(uttr);
     }
 
     * genSpeak(text : string){
