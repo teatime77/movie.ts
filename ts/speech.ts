@@ -1,10 +1,12 @@
 namespace movie_ts{
 
+export let voiceLanguageCode : string = "eng";
+
 const PlayMode = plane_ts.PlayMode;
 
 const voiceMap = new Map<string, SpeechSynthesisVoice[]>();
 
-const langCodeMap = new Map<string, string>([
+export const langCodeList : [string, string][] = [
     ["ara", "ar-EG"],
     ["chi", "zh-CN"],
     ["eng", "en-US"],
@@ -17,7 +19,9 @@ const langCodeMap = new Map<string, string>([
     ["rus", "ru-RU"],
     ["spa", "es-ES"],
     ["por", "pt-PT"],
-]);
+];
+
+export const langCodeMap = new Map<string, string>(langCodeList);
 
 const voiceNamesDic : { [lang: string]: string[] } = {
     "ja-JP" : [
@@ -84,7 +88,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
 
         if(this.voice == undefined){
 
-            this.voice = getVoiceByLangCode(i18n_ts.languageCode);
+            this.voice = getVoiceByLangCode(voiceLanguageCode);
             if(this.voice != undefined){
                 // msg(`use voice:${this.voice.name}`);
             }

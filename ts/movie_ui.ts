@@ -12,15 +12,12 @@ const $button = layout_ts.$button;
 
 type Flex = layout_ts.Flex;
 
+let isVoiceLang : boolean;
+
 export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex) : layout_ts.Grid {
     const root = $grid({
-        rows     : "25px 25px 864px 48px",
+        rows     : "25px 864px 48px",
         children:[
-            $block({
-                id : "language-bar",
-                children : [],
-            })
-            ,
             $grid({
                 columns  : "50% 50%",
                 children: [
@@ -149,13 +146,8 @@ export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layo
     
     const root = $grid({
         width : "486px",
-        rows     : "25px 864px 48px",
+        rows     : "864px 48px",
         children:[
-            $block({
-                id : "language-bar",
-                children : [],
-            })
-            ,
             $grid({
                 columns : "486px",
                 children : [
@@ -169,5 +161,54 @@ export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layo
 
     return root;    
 }
+
+export function showLangDlg(is_voice_lang : boolean){
+    isVoiceLang = is_voice_lang;
+    $dlg("lang-dlg").showModal();
+}
+
+export function langButtonClicked(ev:MouseEvent){
+    const button = ev.target as HTMLButtonElement;
+    const code3 = button.value;
+    msg(`lang:${code3}`);
+    if(isVoiceLang){
+        voiceLanguageCode = code3;
+        setCookie("VoiceLanguage", code3);
+    }
+    else{
+        i18n_ts.setTextLanguageCode(code3)
+        i18n_ts.loadTranslationMap();
+        
+        setCookie("TextLanguage", code3);
+    }
+    $dlg("lang-dlg").close();
+}
+
+export function setCookie(name : string, value : string) {
+    var expires = "";
+    var date = new Date();
+    // Set the expiration date to 20 years from now
+    date.setTime(date.getTime() + (20 * 365 * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+// Function to get a cookie value by name
+export function getCookie(name : string) : string | undefined {
+    var nameEQ = name + "=";
+    var cookiesArray = document.cookie.split(';');
+    for (var i = 0; i < cookiesArray.length; i++) {
+        var cookie = cookiesArray[i];
+        while (cookie.charAt(0) == ' ') {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(nameEQ) == 0) {
+            return cookie.substring(nameEQ.length, cookie.length);
+        }
+    }
+
+    return undefined;
+}
+
 
 }

@@ -28,7 +28,7 @@ export function playAudio(speech : Speech, speech_id : number){
         document.body.removeChild(audio)
     });
 
-    const audio_path = getAudioPath(i18n_ts.languageCode, speech_id);
+    const audio_path = getAudioPath(voiceLanguageCode, speech_id);
     msg(`${audio_path}`);
     audio.src = audio_path;
     const timer_id = setInterval(()=>{

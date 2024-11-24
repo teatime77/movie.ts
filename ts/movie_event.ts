@@ -14,6 +14,32 @@ export async function bodyOnLoad(){
     document.body.style.color = plane_ts.fgColor;
     document.body.style.backgroundColor = plane_ts.bgColor;
 
+    let voice_lang = getCookie("VoiceLanguage");
+    let text_lang  = getCookie("TextLanguage");
+
+    if(voice_lang == undefined || text_lang == undefined){
+        const code_pair = langCodeList.find(x => x[1] == navigator.language);
+        if(code_pair != undefined){
+            if(voice_lang == undefined){
+                voice_lang = code_pair[0];
+            }
+
+            if(text_lang == undefined){
+                text_lang = code_pair[0];
+            }
+        }
+    }
+
+    if(voice_lang != undefined){
+        voiceLanguageCode = voice_lang;
+    }
+
+    if(text_lang != undefined){
+        i18n_ts.setTextLanguageCode(text_lang);
+    }
+
+    msg(`lang voice:${voice_lang} text:${text_lang} nav:${navigator.language}`);
+
     const [ origin, pathname, params] = i18n_ts.parseURL();
     urlOrigin = origin;
     msg(`params:${JSON.stringify(params) }`);
@@ -65,18 +91,27 @@ export async function bodyOnLoad(){
             })
             ,
             $button({
+                click : async (ev : MouseEvent)=>{
+                    showLangDlg(true);
+                },
                 url    : `${urlOrigin}/lib/plane/img/volume.png`,
                 width  : "48px",
                 height : "48px",
             })
             ,
             $button({
+                click : async (ev : MouseEvent)=>{
+                    showLangDlg(false);
+                },
                 url    : `${urlOrigin}/lib/plane/img/subtitle.png`,
                 width  : "48px",
                 height : "48px",
             })
         ]
     });
+
+    play_buttons.div.style.alignItems = "center";
+    play_buttons.div.style.alignContent = "center";
 
 
     if(edit_mode){
@@ -88,8 +123,6 @@ export async function bodyOnLoad(){
     }
 
     layout_ts.initLayout(root);
-
-    i18n_ts.initLanguageBar($("language-bar"));
 
     plane_ts.initPlane(plane, root);
     
@@ -112,6 +145,11 @@ export async function bodyOnLoad(){
 
         await readDoc(parseInt(doc_id));
     }
+
+    const buttons = document.getElementsByClassName("lang_button") as HTMLCollectionOf<HTMLButtonElement>;
+    for(const button of buttons){
+        button.addEventListener("click", langButtonClicked);
+    }
 }
 
 export async function readDoc(id : number) {
@@ -122,8 +160,6 @@ export async function readDoc(id : number) {
         // msg(`read doc:${theDoc.id} ${theDoc.name}`)
         const obj = JSON.parse(theDoc.text);
         plane_ts.loadData(obj);
-
-        i18n_ts.initLanguageBar($("language-bar"), id);
     }
 }
 
