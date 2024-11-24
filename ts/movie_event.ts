@@ -6,6 +6,7 @@ export let root : layout_ts.Grid;
 export let urlOrigin : string;
 
 const $button = layout_ts.$button;
+const $flex = layout_ts.$flex;
 
 const PlayMode = plane_ts.PlayMode;
 
@@ -24,34 +25,66 @@ export async function bodyOnLoad(){
     const plane = new plane_ts.Plane();
     let root : layout_ts.Grid;
 
-    const play_button = $button({
-        text : "Play",
-        click : async (ev : MouseEvent)=>{
-            await play(PlayMode.normal);
-        }
+    const play_buttons = $flex({
+        children : [
+            $button({
+                id : "show-contents",
+                click : async (ev : MouseEvent)=>{
+                    firebase_ts.showContents(readDoc);
+                },
+                url    : `${urlOrigin}/lib/plane/img/bullet-list.png`,
+                width  : "48px",
+                height : "48px",
+            })
+            ,
+            $button({
+                url    : `${urlOrigin}/lib/plane/img/back.png`,
+                width  : "48px",
+                height : "48px",
+            })
+            ,
+            $button({
+                url    : `${urlOrigin}/lib/plane/img/previous.png`,
+                width  : "48px",
+                height : "48px",
+            })
+            ,
+            $button({
+                click : async (ev : MouseEvent)=>{
+                    if(Plane.one.playMode == PlayMode.stop){
+
+                        await play(PlayMode.normal);
+                    }
+                    else{
+                        stopPlay();
+                    }
+                },
+                url    : `${urlOrigin}/lib/plane/img/play.png`,
+                width  : "48px",
+                height : "48px",
+            })
+            ,
+            $button({
+                url    : `${urlOrigin}/lib/plane/img/volume.png`,
+                width  : "48px",
+                height : "48px",
+            })
+            ,
+            $button({
+                url    : `${urlOrigin}/lib/plane/img/subtitle.png`,
+                width  : "48px",
+                height : "48px",
+            })
+        ]
     });
 
-    const stop_button = $button({
-        text : "Stop",
-        click : async (ev : MouseEvent)=>{
-            stopPlay();
-        }
-    });
-
-    const show_contents_button = $button({
-        id : "show-contents",
-        text : "show contents",
-        click : async (ev : MouseEvent)=>{
-            firebase_ts.showContents(readDoc);
-        }
-    });
 
     if(edit_mode){
 
-        root = makeEditGrid(plane, play_button, stop_button, show_contents_button);
+        root = makeEditGrid(plane, play_buttons);
     }
     else{
-        root = makePlayGrid(plane, play_button, stop_button, show_contents_button);
+        root = makePlayGrid(plane, play_buttons);
     }
 
     layout_ts.initLayout(root);

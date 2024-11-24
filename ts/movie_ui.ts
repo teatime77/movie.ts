@@ -10,9 +10,11 @@ const $grid = layout_ts.$grid;
 const $block = layout_ts.$block;
 const $button = layout_ts.$button;
 
-export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_button : Button, show_contents_button : Button) : layout_ts.Grid {
+type Flex = layout_ts.Flex;
+
+export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex) : layout_ts.Grid {
     const root = $grid({
-        rows     : "25px 25px 864px",
+        rows     : "25px 25px 864px 48px",
         children:[
             $block({
                 id : "language-bar",
@@ -26,12 +28,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
                     ,
                     $flex({
                         children : [
-                            show_contents_button
-                            ,
-                            play_button
-                            ,
-                            stop_button
-                            ,
                             $button({
                                 text : "new doc",
                                 click : async (ev:MouseEvent)=>{
@@ -112,13 +108,15 @@ export function makeEditGrid(plane : plane_ts.Plane, play_button : Button, stop_
                     plane.property_block
                 ]
             })
+            ,
+            play_buttons
         ]
     });
 
     return root;    
 }
 
-export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_button : Button, show_contents_button : Button) : layout_ts.Grid {
+export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layout_ts.Grid {
     let content_grid : layout_ts.Grid;
     const horizontal = false;
     if(horizontal){
@@ -151,35 +149,11 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
     
     const root = $grid({
         width : "486px",
-        rows     : "25px 25px 864px",
+        rows     : "25px 864px 48px",
         children:[
             $block({
                 id : "language-bar",
                 children : [],
-            })
-            ,
-            $flex({
-                children : [
-                    show_contents_button
-                    ,
-                    play_button
-                    ,
-                    stop_button
-                    ,
-                    $button({
-                        text : "log",
-                        click : async (ev:MouseEvent)=>{
-                            layout_ts.Log.show(ev);
-                        }
-                    })
-                    ,
-                    $button({
-                        text : "play all",
-                        click : async (ev:MouseEvent)=>{
-                            await playAll();
-                        }
-                    })
-                ]
             })
             ,
             $grid({
@@ -188,6 +162,8 @@ export function makePlayGrid(plane : plane_ts.Plane, play_button : Button, stop_
                     content_grid
                 ]
             })
+            ,
+            play_buttons
         ]
     });
 
