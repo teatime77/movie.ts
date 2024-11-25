@@ -11,8 +11,8 @@ const $flex = layout_ts.$flex;
 const PlayMode = plane_ts.PlayMode;
 
 export async function bodyOnLoad(){
-    document.body.style.color = plane_ts.fgColor;
-    document.body.style.backgroundColor = plane_ts.bgColor;
+    document.body.style.color = layout_ts.fgColor;
+    document.body.style.backgroundColor = layout_ts.bgColor;
 
     let voice_lang = getCookie("VoiceLanguage");
     let text_lang  = getCookie("TextLanguage");
