@@ -59,18 +59,8 @@ export async function bodyOnLoad(){
                     firebase_ts.showContents(readDoc);
                 },
                 url    : `${urlOrigin}/lib/plane/img/bullet-list.png`,
-                width  : "48px",
-                height : "48px",
-            })
-            ,
-            $button({
-                url    : `${urlOrigin}/lib/plane/img/back.png`,
-                width  : "48px",
-                height : "48px",
-            })
-            ,
-            $button({
-                url    : `${urlOrigin}/lib/plane/img/previous.png`,
+                position : "static",
+                margin : "auto 5px",
                 width  : "48px",
                 height : "48px",
             })
@@ -86,6 +76,8 @@ export async function bodyOnLoad(){
                     }
                 },
                 url    : `${urlOrigin}/lib/plane/img/play.png`,
+                position : "static",
+                margin : "auto 5px",
                 width  : "48px",
                 height : "48px",
             })
@@ -95,6 +87,8 @@ export async function bodyOnLoad(){
                     showLangDlg(true);
                 },
                 url    : `${urlOrigin}/lib/plane/img/volume.png`,
+                position : "static",
+                margin : "auto 5px",
                 width  : "48px",
                 height : "48px",
             })
@@ -104,14 +98,17 @@ export async function bodyOnLoad(){
                     showLangDlg(false);
                 },
                 url    : `${urlOrigin}/lib/plane/img/subtitle.png`,
+                position : "static",
+                margin : "auto 5px",
                 width  : "48px",
                 height : "48px",
             })
         ]
     });
 
+    play_buttons.div.style.display = "flex";
     play_buttons.div.style.alignItems = "center";
-    play_buttons.div.style.alignContent = "center";
+    play_buttons.div.style.justifyContent = "center";
 
 
     if(edit_mode){
