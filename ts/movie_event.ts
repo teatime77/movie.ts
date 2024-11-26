@@ -4,6 +4,7 @@ namespace movie_ts {
 export let theDoc : firebase_ts.DbDoc | undefined;
 export let root : layout_ts.Grid;
 export let urlOrigin : string;
+export let playStopButton : layout_ts.Button;
 
 const $button = layout_ts.$button;
 const $flex = layout_ts.$flex;
@@ -51,24 +52,26 @@ export async function bodyOnLoad(){
     const plane = new plane_ts.Plane();
     let root : layout_ts.Grid;
 
-    const play_stop_button = $button({
+    const button_size = window.innerHeight / 16;
+
+    playStopButton = $button({
         id : "play-stop-button",
         click : async (ev : MouseEvent)=>{
             if(Plane.one.playMode == PlayMode.stop){
 
-                play_stop_button.setImgUrl(`${urlOrigin}/lib/plane/img/pause.png`);
+                playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/pause.png`);
                 await play(PlayMode.normal);
             }
             else{
                 stopPlay();
-                play_stop_button.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
+                playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
             }
         },
         url    : `${urlOrigin}/lib/plane/img/play.png`,
         position : "static",
         margin : "auto 5px",
-        width  : "48px",
-        height : "48px",
+        width  : `${button_size}px`,
+        height : `${button_size}px`,
     });
 
     const play_buttons = $flex({
@@ -81,11 +84,11 @@ export async function bodyOnLoad(){
                 url    : `${urlOrigin}/lib/plane/img/bullet-list.png`,
                 position : "static",
                 margin : "auto 5px",
-                width  : "48px",
-                height : "48px",
+                width  : `${button_size}px`,
+                height : `${button_size}px`,
             })
             ,
-            play_stop_button
+            playStopButton
             ,
             $button({
                 click : async (ev : MouseEvent)=>{
@@ -94,8 +97,8 @@ export async function bodyOnLoad(){
                 url    : `${urlOrigin}/lib/plane/img/volume.png`,
                 position : "static",
                 margin : "auto 5px",
-                width  : "48px",
-                height : "48px",
+                width  : `${button_size}px`,
+                height : `${button_size}px`,
             })
             ,
             $button({
@@ -105,8 +108,8 @@ export async function bodyOnLoad(){
                 url    : `${urlOrigin}/lib/plane/img/subtitle.png`,
                 position : "static",
                 margin : "auto 5px",
-                width  : "48px",
-                height : "48px",
+                width  : `${button_size}px`,
+                height : `${button_size}px`,
             })
         ]
     });
@@ -118,10 +121,10 @@ export async function bodyOnLoad(){
 
     if(edit_mode){
 
-        root = makeEditGrid(plane, play_buttons);
+        root = makeEditGrid(plane, play_buttons, button_size);
     }
     else{
-        root = makePlayGrid(plane, play_buttons);
+        root = makePlayGrid(plane, play_buttons, button_size);
     }
 
     layout_ts.initLayout(root);

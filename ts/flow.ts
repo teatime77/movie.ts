@@ -161,6 +161,7 @@ export async function play(play_mode : PlayMode) {
 
     for(const shape of view_shapes){
         if(stopPlayFlag){
+            stopPlayFlag = false;
             msg("stop play");
             break;
         }
@@ -252,10 +253,12 @@ export async function play(play_mode : PlayMode) {
     View.current.updateShapes();
 
     Plane.one.playMode = PlayMode.stop;
+    playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
 }
 
 export function stopPlay(){
     cancelSpeech();
+    stopAudio();
     stopPlayFlag = true;
 }
 

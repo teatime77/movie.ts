@@ -14,9 +14,13 @@ type Flex = layout_ts.Flex;
 
 let isVoiceLang : boolean;
 
-export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex) : layout_ts.Grid {
+export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
+    const margin = 10;
+    const canvas_narration_height = window.innerHeight - margin - 25 - button_size;
+    const canvas_size = Math.min(window.innerWidth, 0.5 * (canvas_narration_height));
+
     const root = $grid({
-        rows     : "25px 864px 48px",
+        rows     : `25px ${canvas_narration_height}px ${button_size}px`,
         children:[
             $grid({
                 columns  : "50% 50%",
@@ -113,12 +117,11 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex) : layo
     return root;    
 }
 
-export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layout_ts.Grid {
+export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
     let content_grid : layout_ts.Grid;
     const horizontal = false;
     const margin = 10;
-    const canvas_size = Math.min(window.innerWidth, 0.5 * (window.innerHeight - margin - 48));
-    msg(`canvassize: ${canvas_size} = Math.min(${window.innerWidth} , ${0.5 * (window.innerHeight - margin - 48)} ) `)
+    const canvas_size = Math.min(window.innerWidth, 0.5 * (window.innerHeight - margin - button_size));
 
     if(horizontal){
         content_grid = $grid({
@@ -151,7 +154,7 @@ export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layo
     
     const root = $grid({
         width : `${canvas_size}px`,
-        rows     : `${window.innerHeight - margin - 48}px 48px`,
+        rows     : `${window.innerHeight - margin - button_size}px ${button_size}px`,
         children:[
             $grid({
                 columns : `${window.innerWidth}px`,
