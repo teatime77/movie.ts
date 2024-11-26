@@ -155,9 +155,6 @@ export async function play(play_mode : PlayMode) {
     View.current.dirty = true;
 
     Plane.one.clearNarrationBox();
-    if(Plane.one.playMode != PlayMode.playAll){
-        await sleep(2000);
-    }
 
     // media_ts.recordAudio();
     // await media_ts.startAudioRecorder();
@@ -244,9 +241,6 @@ export async function play(play_mode : PlayMode) {
     // media_ts.stopAudioRecorder();
 
     View.current.dirty = true;
-    if(Plane.one.playMode != PlayMode.playAll){
-        await sleep(2000);
-    }
 
     View.current.shapes = view_shapes;
 

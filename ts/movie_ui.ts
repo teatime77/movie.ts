@@ -116,11 +116,15 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex) : layo
 export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layout_ts.Grid {
     let content_grid : layout_ts.Grid;
     const horizontal = false;
+    const margin = 10;
+    const canvas_size = Math.min(window.innerWidth, 0.5 * (window.innerHeight - margin - 48));
+    msg(`canvassize: ${canvas_size} = Math.min(${window.innerWidth} , ${0.5 * (window.innerHeight - margin - 48)} ) `)
+
     if(horizontal){
         content_grid = $grid({
             children : [
                 $grid({
-                    columns  : "50% 50%",
+                    columns  : `${canvas_size}px 100%`,
 
                     children : [
                         plane.narration_box
@@ -135,7 +139,8 @@ export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layo
 
         content_grid = $grid({
             id : "canvas-narration",
-            rows  : "486px 378px",
+            columns  : `${canvas_size}px`,
+            rows  : `${canvas_size}px 100%`,
             children : [
                 plane.canvas_block
                 ,
@@ -145,11 +150,11 @@ export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex) : layo
     }
     
     const root = $grid({
-        width : "486px",
-        rows     : "864px 48px",
+        width : `${canvas_size}px`,
+        rows     : `${window.innerHeight - margin - 48}px 48px`,
         children:[
             $grid({
-                columns : "486px",
+                columns : `${window.innerWidth}px`,
                 children : [
                     content_grid
                 ]
@@ -178,7 +183,7 @@ export function langButtonClicked(ev:MouseEvent){
     else{
         i18n_ts.setTextLanguageCode(code3)
         i18n_ts.loadTranslationMap();
-        
+
         setCookie("TextLanguage", code3);
     }
     $dlg("lang-dlg").close();

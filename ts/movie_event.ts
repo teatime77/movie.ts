@@ -51,6 +51,26 @@ export async function bodyOnLoad(){
     const plane = new plane_ts.Plane();
     let root : layout_ts.Grid;
 
+    const play_stop_button = $button({
+        id : "play-stop-button",
+        click : async (ev : MouseEvent)=>{
+            if(Plane.one.playMode == PlayMode.stop){
+
+                play_stop_button.setImgUrl(`${urlOrigin}/lib/plane/img/pause.png`);
+                await play(PlayMode.normal);
+            }
+            else{
+                stopPlay();
+                play_stop_button.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
+            }
+        },
+        url    : `${urlOrigin}/lib/plane/img/play.png`,
+        position : "static",
+        margin : "auto 5px",
+        width  : "48px",
+        height : "48px",
+    });
+
     const play_buttons = $flex({
         children : [
             $button({
@@ -65,22 +85,7 @@ export async function bodyOnLoad(){
                 height : "48px",
             })
             ,
-            $button({
-                click : async (ev : MouseEvent)=>{
-                    if(Plane.one.playMode == PlayMode.stop){
-
-                        await play(PlayMode.normal);
-                    }
-                    else{
-                        stopPlay();
-                    }
-                },
-                url    : `${urlOrigin}/lib/plane/img/play.png`,
-                position : "static",
-                margin : "auto 5px",
-                width  : "48px",
-                height : "48px",
-            })
+            play_stop_button
             ,
             $button({
                 click : async (ev : MouseEvent)=>{
