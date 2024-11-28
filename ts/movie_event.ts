@@ -127,7 +127,7 @@ export async function bodyOnLoad(){
         root = makePlayGrid(plane, play_buttons, button_size);
     }
 
-    layout_ts.initLayout(root);
+    layout_ts.Layout.initLayout(root);
 
     plane_ts.initPlane(plane, root);
     

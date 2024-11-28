@@ -20,6 +20,7 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
     const canvas_size = Math.min(window.innerWidth, 0.5 * (canvas_narration_height));
 
     const root = $grid({
+        id : "edit-root",
         rows     : `25px ${canvas_narration_height}px ${button_size}px`,
         children:[
             $grid({
@@ -120,7 +121,7 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
 export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
     let content_grid : layout_ts.Grid;
     const horizontal = false;
-    const margin = 10;
+    const margin = 40;
     const canvas_size = Math.min(window.innerWidth, 0.5 * (window.innerHeight - margin - button_size));
 
     if(horizontal){
