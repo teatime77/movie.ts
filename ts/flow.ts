@@ -134,6 +134,34 @@ async function generateTex(shape : TextBlock | Statement, speech : Speech, named
     }
 }
 
+export async function playLangs(){
+    const langs = [
+        "ara",
+        "chi",
+         "eng",
+         "fre", 
+         "ger",
+         "hin",
+         "ind",
+         "jpn",
+         "kor",
+         "rus",
+         "spa",
+         "por",    
+    ]
+    for(const code3 of langs){
+
+        voiceLanguageCode = code3;
+        setCookie("VoiceLanguage", code3);
+        i18n_ts.setTextLanguageCode(code3)
+        i18n_ts.loadTranslationMap();
+
+        setCookie("TextLanguage", code3);
+
+        await play(PlayMode.normal);
+    }
+}
+
 export async function play(play_mode : PlayMode) {
     Plane.one.playMode = play_mode;
     stopPlayFlag = false;
