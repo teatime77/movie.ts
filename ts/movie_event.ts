@@ -234,7 +234,7 @@ export async function updateDoc(){
 
     theDoc.setName(name);
     theDoc.text = json;
-    theDoc.updateDocDB(user.uid);
+    theDoc.updateDocDB();
 }
 
 export function SignUp(){

@@ -56,7 +56,7 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                                 click : async (ev:MouseEvent)=>{
                                     if(confirm(TT("Do you want to start the backup?"))){
 
-                                        await firebase_ts.BackUp(1);
+                                        await firebase_ts.BackUp();
                                     }
                                 }
                             })
