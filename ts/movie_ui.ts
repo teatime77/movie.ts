@@ -59,6 +59,13 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                             })
                             ,
                             $button({
+                                text : "edit contents",
+                                click : async (ev:MouseEvent)=>{
+                                    await firebase_ts.showContents();
+                                }
+                            })
+                            ,
+                            $button({
                                 text : "Back up",
                                 click : async (ev:MouseEvent)=>{
                                     if(confirm(TT("Do you want to start the backup?"))){
