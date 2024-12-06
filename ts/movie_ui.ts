@@ -1,16 +1,13 @@
 namespace movie_ts {
 //
 
-type Block = layout_ts.Block;
-type Button = layout_ts.Button;
-const Statement = plane_ts.Statement;
+export const $flex = layout_ts.$flex;
+export const $grid = layout_ts.$grid;
+export const $button = layout_ts.$button;
+export const $label = layout_ts.$label;
 
-const $flex = layout_ts.$flex;
-const $grid = layout_ts.$grid;
-const $block = layout_ts.$block;
-const $button = layout_ts.$button;
-
-type Flex = layout_ts.Flex;
+export type Flex = layout_ts.Flex;
+export type TextArea = layout_ts.TextArea;
 
 let isVoiceLang : boolean;
 
@@ -48,13 +45,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                                 text : "play all",
                                 click : async (ev:MouseEvent)=>{
                                     await playAll();
-                                }
-                            })
-                            ,
-                            $button({
-                                text : "image",
-                                click : async (ev:MouseEvent)=>{
-                                    await firebase_ts.showImageDlg(ev);
                                 }
                             })
                             ,

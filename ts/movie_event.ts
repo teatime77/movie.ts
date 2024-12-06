@@ -45,8 +45,6 @@ export async function bodyOnLoad(){
     urlOrigin = origin;
     msg(`params:${JSON.stringify(params) }`);
 
-    const edit_mode = (params.get("mode") == "edit");
-
     i18n_ts.initI18n();
 
     const plane = new plane_ts.Plane();
@@ -119,12 +117,16 @@ export async function bodyOnLoad(){
     play_buttons.div.style.justifyContent = "center";
 
 
-    if(edit_mode){
-
+    switch(params.get("mode")){
+    case "edit":
         root = makeEditGrid(plane, play_buttons, button_size);
-    }
-    else{
+        break;
+    case "lesson":
+        root = makeLessonGrid(play_buttons, button_size);
+        break;
+    default:
         root = makePlayGrid(plane, play_buttons, button_size);
+        break;
     }
 
     layout_ts.Layout.initLayout(root);
