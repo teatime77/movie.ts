@@ -336,7 +336,7 @@ export async function convert(){
         }
     
         msg(`convert:${theDoc.name} [${theDoc.text}]`);
-        theDoc.updateDocDB();
+        await theDoc.updateDocDB();
     }
 
     msg("convert finished.")

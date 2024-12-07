@@ -10,6 +10,13 @@ const $button = layout_ts.$button;
 const $flex = layout_ts.$flex;
 
 const PlayMode = plane_ts.PlayMode;
+export let appMode : AppMode;
+
+enum AppMode {
+    edit,
+    lesson,
+    play
+}
 
 export async function bodyOnLoad(){
     document.body.style.color = layout_ts.fgColor;
@@ -77,7 +84,16 @@ export async function bodyOnLoad(){
             $button({
                 id : "show-contents",
                 click : async (ev : MouseEvent)=>{
-                    firebase_ts.showContents(readDoc);
+                    switch(appMode){
+                    case AppMode.edit:
+                    case AppMode.play:
+                        firebase_ts.showContents(readDoc, undefined);
+                        break;
+
+                    case AppMode.lesson:
+                        firebase_ts.showContents(readLesson, undefined);
+                        break;
+                    }
                 },
                 url    : `${urlOrigin}/lib/plane/img/bullet-list.png`,
                 position : "static",
@@ -119,12 +135,16 @@ export async function bodyOnLoad(){
 
     switch(params.get("mode")){
     case "edit":
+        appMode = AppMode.edit;
         root = makeEditGrid(plane, play_buttons, button_size);
         break;
     case "lesson":
+        appMode = AppMode.lesson;
+        initLesson();
         root = makeLessonGrid(play_buttons, button_size);
         break;
     default:
+        appMode = AppMode.play;
         root = makePlayGrid(plane, play_buttons, button_size);
         break;
     }
@@ -170,49 +190,6 @@ export async function readDoc(id : number) {
     }
 }
 
-function inputDocName(default_name : string) : string {
-    let name = prompt("Enter the document name.", default_name);
-    if(name == null || name.trim() == ""){
-        return "";
-    }
-
-    return name.trim();
-}
-
-export async function putNewDoc(){
-    let default_name = "";
-
-    if(theDoc != undefined){
-        if(!confirm("document is already read.\nSave as another file?")){
-            return;
-        }
-        default_name = theDoc.name;
-    }
-
-    const name = inputDocName(default_name);
-    if(name == ""){
-        return;
-    }
-
-    const json = plane_ts.View.getJson();
-    if(json == ""){
-        return;
-    }
-    msg(`json:[${json}]`);
-
-    const root_folder = await firebase_ts.getRootFolder();
-    if(root_folder == null){
-        throw new MyError("can not get root folder.");
-    }
-
-    try{
-        theDoc = await firebase_ts.putDoc(root_folder, name, json);
-    }
-    catch(e){
-        throw new MyError(`${e}`);
-    }
-}
-
 export async function updateDoc(){
     const user = firebase_ts.getUser();
     if(user == null){
@@ -224,7 +201,7 @@ export async function updateDoc(){
         return;
     }
 
-    const name = inputDocName(theDoc.name);
+    const name = firebase_ts.inputDocName(theDoc.name);
     if(name == ""){
         return;
     }
@@ -236,7 +213,7 @@ export async function updateDoc(){
 
     theDoc.setName(name);
     theDoc.text = json;
-    theDoc.updateDocDB();
+    await theDoc.updateDocDB();
 }
 
 export function SignUp(){

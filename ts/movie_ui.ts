@@ -28,13 +28,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                     $flex({
                         children : [
                             $button({
-                                text : "new doc",
-                                click : async (ev:MouseEvent)=>{
-                                    putNewDoc();
-                                }
-                            })
-                            ,
-                            $button({
                                 text : "update doc",
                                 click : async (ev:MouseEvent)=>{
                                     updateDoc();
@@ -51,7 +44,7 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                             $button({
                                 text : "edit contents",
                                 click : async (ev:MouseEvent)=>{
-                                    await firebase_ts.showContents();
+                                    await firebase_ts.showContents(undefined, undefined);
                                 }
                             })
                             ,

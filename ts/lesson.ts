@@ -1,5 +1,8 @@
 namespace movie_ts {
 //
+export type  Widget = plane_ts.Widget;
+export const Widget = plane_ts.Widget;
+
 export const ImgDiv = layout_ts.ImgDiv;
 export type ImgDiv = layout_ts.ImgDiv;
 export type Attr = layout_ts.Attr;
@@ -7,72 +10,298 @@ export type Attr = layout_ts.Attr;
 export const $imgdiv = layout_ts.$imgdiv;
 export const $textarea = layout_ts.$textarea;
 
+export const last = i18n_ts.last;
+
 let root : layout_ts.Grid;
 let thumbnails : layout_ts.Flex;
 let thumbnails_content : layout_ts.Grid;
 let slide_ui : layout_ts.Flex;
 let quiz_ui : layout_ts.Grid;
+let theLesson : Lesson;
+let current : Slide | Quiz | undefined;
 
-class Slide {
-    imgDiv : ImgDiv;
 
-    constructor(imgDiv : ImgDiv){
-        this.imgDiv = imgDiv;
+class Slide extends Widget {
+    static ui = { 
+        explanation : $textarea({
+            id : "slide-text",
+            cols : 80,
+            rows : 30
+        })
+    };
+
+    imgPath : string = "";
+    explanation : string = "";
+    downloadURL : string = "";
+
+    constructor(data : { imgPath? : string, explanation? : string }){
+        super(data);
+        if(data.imgPath != undefined){
+
+            this.imgPath = data.imgPath;
+        }
+
+        if(data.explanation != undefined){
+
+            this.explanation = data.explanation;
+        }
+    }
+
+    makeObj() : any {
+        let obj = Object.assign(super.makeObj(), {
+            imgPath     : this.imgPath,
+            explanation : this.explanation
+        });
+
+        return obj;
+    }
+
+    async getDownloadURL(){
+        let url = this.imgPath;
+        if(url.startsWith("users/")){
+            
+            url = await firebase_ts.getStorageDownloadURL(url);
+        }
+
+        return url;
+    }
+
+    async addThumbnail(file? : File){
+        this.downloadURL = await this.getDownloadURL();
+
+        const img = layout_ts.$img({
+            imgUrl : this.downloadURL,
+            file   : file,
+            width : "100px",
+            height : "100px",
+            click : async (ev : MouseEvent)=>{
+                updateDataByUI();
+                current = this;
+                this.show();
+            }
+        });
+    
+        thumbnails.addChild(img);    
+    }
+
+    show(){
+        setEditUI(slide_ui);
+
+        (slide_ui.$("slide-img") as ImgDiv).setImgUrl(this.downloadURL);
+        Slide.ui.explanation.setValue(this.explanation);
+
+        root.updateRootLayout();
     }
 }
 
-class Quiz {
+class Quiz extends Widget {
+    static ui = {
+        question : $textarea({
+            cols : 80,
+            rows : 5,
+        })
+        ,
+        choices : $textarea({
+            cols : 80,
+            rows : 5,
+            placeholder : 
+`1st choice. This choice should be the correct answer.
+            
+2nd choice. Each choice must be separated by a blank line.
+
+3rd choice. There is no limit to the number of choices.`
+        })
+        ,
+        commentary : $textarea({
+            cols : 80,
+            rows : 5,
+        })
+
+    };
+
     question : string;
     choices : string[];
-    explanation : string;
+    commentary : string;
 
-    constructor( data : { question : string, choices : string[], explanation : string }){
-        this.question = data.question;
-        this.choices = data.choices;
-        this.explanation = data.explanation;
+    constructor( data : { question : string, choices : string[], commentary : string }){
+        super(data);
+        this.question   = data.question;
+        this.choices    = data.choices;
+        this.commentary = data.commentary;
+    }
+
+    makeObj() : any {
+        let obj = Object.assign(super.makeObj(), {
+            question   : this.question,
+            choices    : this.choices,
+            commentary : this.commentary
+        });
+
+        return obj;
+    }
+
+    async addThumbnail(){
+        const img = layout_ts.$img({
+            imgUrl : `${urlOrigin}/lib/movie/img/quiz.png`,
+            width : "100px",
+            height : "100px",
+            click : async (ev : MouseEvent)=>{
+                updateDataByUI();
+                current = this;
+                this.show();
+            }
+        });
+    
+        thumbnails.addChild(img);    
+    }
+
+    show(){
+        setEditUI(quiz_ui)
+
+        Quiz.ui.question.setValue(this.question);
+        Quiz.ui.choices.setValue(this.commentary);
+        Quiz.ui.commentary.setValue(this.commentary);
+
+        root.updateRootLayout();
     }
 }
 
-class Lesson {
-    slide_quiz_list : (Slide | Quiz)[] = [];
+class Lesson extends Widget {
+    materials : (Slide | Quiz)[] = [];
+
+    constructor(data : { materials : (Slide | Quiz)[] }){
+        super(data);
+
+        this.materials = data.materials;
+    }
+
+    makeObj() : any {
+        let obj = Object.assign(super.makeObj(), {
+            materials : this.materials.map(x => x.makeObj())
+        });
+
+        return obj;
+    }
+
+    show(){
+        this.materials.forEach(x => x.show());
+    }
 }
 
-async function addSlide(){
+function getTextsFromNewlineDelimitedString(str : string) : string[] {
+    const texts : string[] = [];
+
+    let lines = str.replaceAll("\r\n", "\n").split("\n");
+    lines = lines.map(x => x.trim());
+
+    let text = "";
+    for(const line of lines){
+        if(line == ""){
+            if(text != ""){
+                texts.push(text);
+                text = "";
+            }
+
+            continue;
+        }
+
+        if(text == ""){
+            text = line;
+        }
+        else{
+            text += "\n" + line;
+        }
+    }
+
+    if(text != ""){
+        texts.push(text);
+    }
+
+    return texts;
+}
+
+function updateDataByUI(){
+    if(current instanceof Slide){
+        current.explanation = Slide.ui.explanation.getValue();
+    }
+    else if(current instanceof Quiz){
+        current.question   = Quiz.ui.question.getValue();
+        current.choices   = getTextsFromNewlineDelimitedString( Quiz.ui.choices.getValue() );
+        current.commentary = Quiz.ui.commentary.getValue();
+    }
+}
+
+function setEditUI(ui : layout_ts.UI){
     assert(thumbnails_content.children.length == 2);
 
     thumbnails_content.children.pop();
+    thumbnails_content.addChild(ui);
+}
+
+async function addSlide(){
+    updateDataByUI();
+
+    current = new Slide({});
+    theLesson.materials.push( current );
+
+    setEditUI(slide_ui);
 
     (slide_ui.$("slide-img") as ImgDiv).clearImg();
-    (slide_ui.$("slide-text") as TextArea).setValue("");
+    Slide.ui.explanation.setValue(current.explanation);
 
-    thumbnails_content.addChild(slide_ui);
     root.updateRootLayout();
 }
 
 async function addQuiz(){
-    assert(thumbnails_content.children.length == 2);
+    updateDataByUI();
 
-    thumbnails_content.children.pop();
+    setEditUI(quiz_ui)
 
-    for(const id of [ "quiz-question", "quiz-choices", "quiz-explanation" ]){
-        (quiz_ui.$(id) as TextArea).setValue("");
+    Quiz.ui.question.setValue("");
+    Quiz.ui.choices.setValue("");
+    Quiz.ui.commentary.setValue("");
+
+    current = new Quiz({
+        question : "",
+        choices : [],
+        commentary : ""
+    });
+
+    theLesson.materials.push(current);
+
+    await current.addThumbnail();
+
+    root.updateRootLayout();
+}
+
+async function newLesson() {
+    const data = theLesson.makeObj();
+    const doc_text = JSON.stringify(data, null, 4);
+
+    firebase_ts.showContents(undefined, doc_text);
+}
+
+async function updateLesson() {
+    if(theDoc == undefined){
+        alert("no document");
+        return;
     }
 
-    thumbnails_content.addChild(quiz_ui);
-    root.updateRootLayout();
+    const data = theLesson.makeObj();
+    theDoc.text = JSON.stringify(data, null, 4);
+    await theDoc.updateDocDB();
 }
 
 async function onFileDrop(file : File){
     const path = await firebase_ts.uploadImgFile(file);
 
-    const img = layout_ts.$img({
-        imgUrl : path,
-        file   : file,
-        width : "100px",
-        height : "100px",
-    });
-
-    thumbnails.addChild(img);
+    if(current instanceof Slide){
+        current.imgPath = path;
+        await current.addThumbnail(file);
+    }
+    else{
+        throw new MyError();
+    }
 
     root.updateRootLayout();
 
@@ -95,44 +324,24 @@ export function makeLessonGrid(play_buttons : Flex, button_size : number) : layo
                 uploadImgFile : onFileDrop
             })       
             ,
-            $textarea({
-                id : "slide-text",
-                cols : 80,
-                rows : 30
-            })                     
+            Slide.ui.explanation
         ]
     });
 
     quiz_ui = $grid({
         columns : "100px 100%",
         children : [
-            $label({ text : "question"}),
-            $textarea({
-                id : "quiz-question",
-                cols : 80,
-                rows : 5,
-            }),
-
-            $label({ text : "choices"}),
-            $textarea({
-                id : "quiz-choices",
-                cols : 80,
-                rows : 5,
-                placeholder : 
-`1st choice. This choice should be the correct answer.
-                
-2nd choice. Each choice must be separated by a blank line.
-
-3rd choice. There is no limit to the number of choices.`
-            }),
-
-            $label({ text : "explanation"}),
-            $textarea({
-                id : "quiz-explanation",
-                cols : 80,
-                rows : 5,
-            }),
-
+            $label({ text : "question"})
+            ,
+            Quiz.ui.question
+            ,
+            $label({ text : "choices"})
+            ,
+            Quiz.ui.choices
+            ,
+            $label({ text : "explanation"})
+            ,
+            Quiz.ui.commentary
         ]
     })
 
@@ -141,7 +350,12 @@ export function makeLessonGrid(play_buttons : Flex, button_size : number) : layo
         columns : "100px 100%",
         children : [
             thumbnails,
-            $label({ text : ""})
+            $label({
+                text : "",
+                width : "300px",
+                height : "300px",
+                backgroundColor : "cyan",
+            })
         ]
     })
     
@@ -152,14 +366,26 @@ export function makeLessonGrid(play_buttons : Flex, button_size : number) : layo
                 children : [
                     $button({
                         text : "add slide",
-                        fontSize : "xxx-large",
+                        fontSize : "large",
                         click : addSlide
                     })
                     ,
                     $button({
                         text : "add quiz",
-                        fontSize : "xxx-large",
+                        fontSize : "large",
                         click : addQuiz
+                    })
+                    ,
+                    $button({
+                        text : "update doc",
+                        fontSize : "large",
+                        click : updateLesson
+                    })
+                    ,
+                    $button({
+                        text : "new doc",
+                        fontSize : "large",
+                        click : newLesson
                     })
                 ]
             })
@@ -181,8 +407,42 @@ function parseLessonObject(obj : any) : any {
         case Quiz.name:
         return new Quiz(obj);
 
+        case Lesson.name:
+            return new Lesson(obj);
+
         default:
-        throw new MyError();
+            throw new MyError();
     }
+}
+
+
+export async function readLesson(id : number) {
+    // msg(`id:${id}`);
+    theDoc = await firebase_ts.getDoc(id);
+    if(theDoc != undefined){
+
+        // msg(`read doc:${theDoc.id} ${theDoc.name}`)
+        const obj = JSON.parse(theDoc.text);
+
+        const lesson = plane_ts.parseObject(obj, parseLessonObject);
+        if(lesson instanceof Lesson){
+
+            msg("lesson loaded");
+            theLesson = lesson;
+
+            for(const material of theLesson.materials){
+                await material.addThumbnail();
+            }
+        }
+        else{
+            throw new MyError();
+        }
+    }
+}
+
+export function initLesson(){
+    theLesson = new Lesson({
+        materials : []
+    });
 }
 }
