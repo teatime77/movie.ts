@@ -13,9 +13,9 @@ export const $textarea = layout_ts.$textarea;
 export const last = i18n_ts.last;
 
 let root : layout_ts.Grid;
-let thumbnails : layout_ts.Flex;
+let thumbnails : layout_ts.Grid;
 let thumbnails_content : layout_ts.Grid;
-let slide_ui : layout_ts.Flex;
+let slide_ui : layout_ts.Grid;
 let quiz_ui : layout_ts.Grid;
 let theLesson : Lesson;
 let current : Slide | Quiz | undefined;
@@ -25,8 +25,6 @@ class Slide extends Widget {
     static ui = { 
         explanation : $textarea({
             id : "slide-text",
-            cols : 80,
-            rows : 30
         })
     };
 
@@ -234,7 +232,7 @@ function updateDataByUI(){
 function setEditUI(ui : layout_ts.UI){
     assert(thumbnails_content.children.length == 2);
 
-    thumbnails_content.children.pop();
+    thumbnails_content.popChild();
     thumbnails_content.addChild(ui);
 }
 
@@ -309,17 +307,18 @@ async function onFileDrop(file : File){
 }
 
 export function makeLessonGrid(play_buttons : Flex, button_size : number) : layout_ts.Grid {
-    thumbnails =$flex({
+    thumbnails =$grid({
+        columns : "100px",
         children : [
         ]
     });
 
-    slide_ui = $flex({
+    slide_ui = $grid({
+        id : "slide-ui",
+        rows : "50% 50%",
         children : [
             $imgdiv({
                 id : "slide-img",
-                width  : "300px",
-                height : "300px",
                 backgroundColor : "cornsilk",
                 uploadImgFile : onFileDrop
             })       
@@ -329,7 +328,9 @@ export function makeLessonGrid(play_buttons : Flex, button_size : number) : layo
     });
 
     quiz_ui = $grid({
+        id : "quiz-ui",
         columns : "100px 100%",
+        rows    : "300px 100% 300px",
         children : [
             $label({ text : "question"})
             ,
@@ -360,7 +361,9 @@ export function makeLessonGrid(play_buttons : Flex, button_size : number) : layo
     })
     
     root = $grid({
+        id : "lesson-root",
         rows : `auto 100% ${button_size}px`,
+        columns : "100%",
         children : [        
             $flex({
                 children : [
@@ -437,6 +440,8 @@ export async function readLesson(id : number) {
         else{
             throw new MyError();
         }
+
+        root.updateRootLayout();
     }
 }
 

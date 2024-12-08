@@ -271,7 +271,7 @@ function setVoiceList(){
     for(const voice of voices){
         // if(voice.lang == languageRegion){
 
-            msg(`voice lang:[${voice.lang}] name:[${voice.name}]`);
+            // msg(`voice lang:[${voice.lang}] name:[${voice.name}]`);
         // }
 
         let voice_lang = voice.lang.replaceAll("_", "-");
@@ -286,7 +286,7 @@ function setVoiceList(){
 
             if(Array.from( langCodeMap.values() ).includes(voice_lang)){
 
-                msg(`voice lang:${voice_lang}`);
+                // msg(`voice lang:${voice_lang}`);
             }
         }
 

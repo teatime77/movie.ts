@@ -10,13 +10,8 @@ const $button = layout_ts.$button;
 const $flex = layout_ts.$flex;
 
 const PlayMode = plane_ts.PlayMode;
-export let appMode : AppMode;
 
-enum AppMode {
-    edit,
-    lesson,
-    play
-}
+const AppMode = i18n_ts.AppMode;
 
 export async function bodyOnLoad(){
     document.body.style.color = layout_ts.fgColor;
@@ -84,7 +79,7 @@ export async function bodyOnLoad(){
             $button({
                 id : "show-contents",
                 click : async (ev : MouseEvent)=>{
-                    switch(appMode){
+                    switch(i18n_ts.appMode){
                     case AppMode.edit:
                     case AppMode.play:
                         firebase_ts.showContents(readDoc, undefined);
@@ -133,18 +128,16 @@ export async function bodyOnLoad(){
     play_buttons.div.style.justifyContent = "center";
 
 
-    switch(params.get("mode")){
-    case "edit":
-        appMode = AppMode.edit;
+    switch(i18n_ts.appMode){
+    case AppMode.edit:
         root = makeEditGrid(plane, play_buttons, button_size);
         break;
-    case "lesson":
-        appMode = AppMode.lesson;
+    case AppMode.lesson:
         initLesson();
         root = makeLessonGrid(play_buttons, button_size);
         break;
+    case AppMode.play:
     default:
-        appMode = AppMode.play;
         root = makePlayGrid(plane, play_buttons, button_size);
         break;
     }
