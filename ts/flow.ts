@@ -158,11 +158,11 @@ export async function playLangs(){
 
         setCookie("TextLanguage", code3);
 
-        await play(PlayMode.normal);
+        await playView(PlayMode.normal);
     }
 }
 
-export async function play(play_mode : PlayMode) {
+export async function playView(play_mode : PlayMode) {
     Plane.one.playMode = play_mode;
     stopPlayFlag = false;
 
@@ -285,6 +285,7 @@ export async function play(play_mode : PlayMode) {
 }
 
 export function stopPlay(){
+    msg("stop play");
     cancelSpeech();
     stopAudio();
     stopPlayFlag = true;
@@ -301,7 +302,7 @@ export async function playAll(){
         const eng_texts_prev = i18n_ts.getEngTexts().slice();
 
         await readDoc(db_doc.id);
-        await play(PlayMode.playAll);
+        await playView(PlayMode.playAll);
 
         const eng_texts_new = i18n_ts.getEngTexts();
     }

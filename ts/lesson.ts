@@ -19,6 +19,7 @@ let slide_ui : layout_ts.Grid;
 let quiz_ui : layout_ts.Grid;
 let theLesson : Lesson;
 let current : Slide | Quiz | undefined;
+let speech : Speech;
 
 
 class Slide extends Widget {
@@ -89,6 +90,29 @@ class Slide extends Widget {
         Slide.ui.explanation.setValue(this.explanation);
 
         root.updateRootLayout();
+    }
+
+    async play(speech : Speech){
+        setEditUI(slide_ui);
+        (slide_ui.$("slide-img") as ImgDiv).setImgUrl(this.downloadURL);
+        Slide.ui.explanation.setValue("");
+        root.updateRootLayout();
+
+        const font_size = Slide.ui.explanation.html().style.fontSize;
+        Slide.ui.explanation.html().style.fontSize = "xxx-large";
+
+        const lines = this.explanation.split("\n").map(x => x.trim()).filter(x => x != "");
+        for(const line of lines){
+            if(stopPlayFlag){
+                msg("break lines by flag");
+                break;
+            }
+    
+            Slide.ui.explanation.setValue(TT(line));
+            await speech.speak_waitEnd(TT(line));
+        }
+
+        Slide.ui.explanation.html().style.fontSize = font_size;
     }
 }
 
@@ -161,6 +185,10 @@ class Quiz extends Widget {
         Quiz.ui.commentary.setValue(this.commentary);
 
         root.updateRootLayout();
+    }
+
+    async play(speech : Speech){
+        this.show();
     }
 }
 
@@ -280,6 +308,8 @@ async function newLesson() {
 }
 
 async function updateLesson() {
+    updateDataByUI();
+    
     if(theDoc == undefined){
         alert("no document");
         return;
@@ -443,6 +473,31 @@ export async function readLesson(id : number) {
 
         root.updateRootLayout();
     }
+}
+
+export async function playLesson(){
+    msg("play lesson start");
+
+    Plane.one.playMode = PlayMode.normal;
+    stopPlayFlag = false;
+
+    speech = new Speech();
+
+    for(const material of theLesson.materials){
+        if(stopPlayFlag){
+            msg("stop by flag");
+            break;
+        }
+
+        await material.play(speech);
+    }
+    msg("play lesson completes");
+
+    Plane.one.playMode = PlayMode.stop;
+}
+
+export async function stopLesson(){
+    cancelSpeech();
 }
 
 export function initLesson(){

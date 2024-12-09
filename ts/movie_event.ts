@@ -60,10 +60,37 @@ export async function bodyOnLoad(){
             if(Plane.one.playMode == PlayMode.stop){
 
                 playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/pause.png`);
-                await play(PlayMode.normal);
+
+                switch(i18n_ts.appMode){
+                case AppMode.edit:
+                case AppMode.play:
+                    await playView(PlayMode.normal);
+                    break;
+
+                case AppMode.lesson:
+                    await playLesson();
+                    break;
+
+                default:
+                    throw new MyError();
+                }
             }
             else{
-                stopPlay();
+                switch(i18n_ts.appMode){
+                case AppMode.edit:
+                case AppMode.play:
+                    stopPlay();
+                    break;
+
+                case AppMode.lesson:
+                    stopPlay();
+                    // await stopLesson();
+                    break;
+
+                default:
+                    throw new MyError();
+                }
+
                 playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
             }
         },
@@ -88,6 +115,8 @@ export async function bodyOnLoad(){
                     case AppMode.lesson:
                         firebase_ts.showContents(readLesson, undefined);
                         break;
+                    default:
+                        throw new MyError();
                     }
                 },
                 url    : `${urlOrigin}/lib/plane/img/bullet-list.png`,
