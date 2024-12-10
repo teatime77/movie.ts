@@ -50,10 +50,36 @@
 
 
 <style type="text/css">
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 .lang_button {
     font-size:xxx-large;
     margin: 4px;
 }
+
+.progress-dialog-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #4CAF50;
+}
+
+
 </style>
 
 </head>
@@ -81,6 +107,15 @@
         <button class="lang_button" value="rus">Русский</button>
         <button class="lang_button" value="spa">español</button>
         <button class="lang_button" value="por">português</button>
+    </div>
+</dialog>
+
+<dialog id="progress-dialog" style="z-index: 1; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div class="progress-dialog-content">
+        <p>Downloading...</p>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
     </div>
 </dialog>
 

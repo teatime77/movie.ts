@@ -4,6 +4,7 @@ namespace movie_ts {
 export let theDoc : firebase_ts.DbDoc | undefined;
 export let root : layout_ts.Grid;
 export let urlOrigin : string;
+export let urlParams : Map<string, string>;
 export let playStopButton : layout_ts.Button;
 
 const $button = layout_ts.$button;
@@ -11,7 +12,7 @@ const $flex = layout_ts.$flex;
 
 const PlayMode = plane_ts.PlayMode;
 
-const AppMode = i18n_ts.AppMode;
+export const AppMode = i18n_ts.AppMode;
 
 export async function bodyOnLoad(){
     document.body.style.color = layout_ts.fgColor;
@@ -43,9 +44,8 @@ export async function bodyOnLoad(){
 
     msg(`lang voice:${voice_lang} text:${text_lang} nav:${navigator.language}`);
 
-    const [ origin, pathname, params] = i18n_ts.parseURL();
-    urlOrigin = origin;
-    msg(`params:${JSON.stringify(params) }`);
+    [ urlOrigin, , urlParams] = i18n_ts.parseURL();
+    msg(`params:${JSON.stringify(urlParams) }`);
 
     i18n_ts.initI18n();
 
@@ -67,7 +67,8 @@ export async function bodyOnLoad(){
                     await playView(PlayMode.normal);
                     break;
 
-                case AppMode.lesson:
+                case AppMode.lessonPlay:
+                case AppMode.lessonEdit:
                     await playLesson();
                     break;
 
@@ -82,7 +83,8 @@ export async function bodyOnLoad(){
                     stopPlay();
                     break;
 
-                case AppMode.lesson:
+                case AppMode.lessonPlay:
+                case AppMode.lessonEdit:
                     stopPlay();
                     // await stopLesson();
                     break;
@@ -95,7 +97,7 @@ export async function bodyOnLoad(){
             }
         },
         url    : `${urlOrigin}/lib/plane/img/play.png`,
-        position : "static",
+        // position : "static",
         margin : "auto 5px",
         width  : `${button_size}px`,
         height : `${button_size}px`,
@@ -112,7 +114,7 @@ export async function bodyOnLoad(){
                         firebase_ts.showContents(readDoc, undefined);
                         break;
 
-                    case AppMode.lesson:
+                    case AppMode.lessonEdit:
                         firebase_ts.showContents(readLesson, undefined);
                         break;
                     default:
@@ -120,7 +122,6 @@ export async function bodyOnLoad(){
                     }
                 },
                 url    : `${urlOrigin}/lib/plane/img/bullet-list.png`,
-                position : "static",
                 margin : "auto 5px",
                 width  : `${button_size}px`,
                 height : `${button_size}px`,
@@ -133,7 +134,6 @@ export async function bodyOnLoad(){
                     showLangDlg(true);
                 },
                 url    : `${urlOrigin}/lib/plane/img/volume.png`,
-                position : "static",
                 margin : "auto 5px",
                 width  : `${button_size}px`,
                 height : `${button_size}px`,
@@ -144,7 +144,6 @@ export async function bodyOnLoad(){
                     showLangDlg(false);
                 },
                 url    : `${urlOrigin}/lib/plane/img/subtitle.png`,
-                position : "static",
                 margin : "auto 5px",
                 width  : `${button_size}px`,
                 height : `${button_size}px`,
@@ -161,10 +160,17 @@ export async function bodyOnLoad(){
     case AppMode.edit:
         root = makeEditGrid(plane, play_buttons, button_size);
         break;
-    case AppMode.lesson:
+
+    case AppMode.lessonPlay:
         initLesson();
-        root = makeLessonGrid(play_buttons, button_size);
+        root = makeLessonPlayGrid(button_size);
         break;
+    
+    case AppMode.lessonEdit:
+        initLesson();
+        root = makeLessonEditGrid(play_buttons, button_size);
+        break;
+
     case AppMode.play:
     default:
         root = makePlayGrid(plane, play_buttons, button_size);
@@ -183,11 +189,16 @@ export async function bodyOnLoad(){
 
     await firebase_ts.initFirebase();
 
+    if(i18n_ts.appMode == AppMode.lessonPlay){
+        firebase_ts.refId = "wutfxujVE0GGD5YW";
+        msg(`set ref-ID:[${firebase_ts.refId}]`);
+    }
+
     const size = layout_ts.getPhysicalSize();
     msg(`size:${size.width_cm.toFixed(1)} ${size.height_cm.toFixed(1)}`);
     msg(`navigator:${navigator.appVersion}`);
 
-    const doc_id = params.get("id");
+    const doc_id = urlParams.get("id");
     if(doc_id != undefined){
 
         const root_folder = await firebase_ts.getRootFolder();
@@ -198,6 +209,10 @@ export async function bodyOnLoad(){
     const buttons = document.getElementsByClassName("lang_button") as HTMLCollectionOf<HTMLButtonElement>;
     for(const button of buttons){
         button.addEventListener("click", langButtonClicked);
+    }
+
+    if(i18n_ts.appMode == AppMode.lessonPlay){
+        await initLessonPlay();
     }
 }
 

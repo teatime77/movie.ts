@@ -3,12 +3,19 @@ namespace movie_ts {
 export type  Widget = plane_ts.Widget;
 export const Widget = plane_ts.Widget;
 
+export type Img = layout_ts.Img;
+export type Grid = layout_ts.Grid;
+export type TextBox = layout_ts.TextBox;
+
 export const ImgDiv = layout_ts.ImgDiv;
 export type ImgDiv = layout_ts.ImgDiv;
 export type Attr = layout_ts.Attr;
 
+export const $img = layout_ts.$img;
+export const $textbox = layout_ts.$textbox;
 export const $imgdiv = layout_ts.$imgdiv;
 export const $textarea = layout_ts.$textarea;
+export const $input_range = layout_ts.$input_range;
 
 export const last = i18n_ts.last;
 
@@ -21,12 +28,25 @@ let theLesson : Lesson;
 let current : Slide | Quiz | undefined;
 let speech : Speech;
 
+let slide_play_ui : layout_ts.Grid;
 
 class Slide extends Widget {
     static ui = { 
+        img : $img({ imgUrl : ""}),
+        textbox : $textbox({
+            text : "",
+            fontSize : "xxx-large",
+            textAlign : "center",
+        }),
+        input_range : $input_range({
+            value : 0,
+            step : 1,
+            min : 0,
+            max : 20
+        }),
         explanation : $textarea({
             id : "slide-text",
-        })
+        }),
     };
 
     imgPath : string = "";
@@ -92,14 +112,11 @@ class Slide extends Widget {
         root.updateRootLayout();
     }
 
-    async play(speech : Speech){
-        setEditUI(slide_ui);
-        (slide_ui.$("slide-img") as ImgDiv).setImgUrl(this.downloadURL);
-        Slide.ui.explanation.setValue("");
+    async play(speech : Speech, img : Img, textbox : TextBox){
+        img.setImgUrl(this.downloadURL);
+        textbox.setText("");
         root.updateRootLayout();
 
-        const font_size = Slide.ui.explanation.html().style.fontSize;
-        Slide.ui.explanation.html().style.fontSize = "xxx-large";
 
         const lines = this.explanation.split("\n").map(x => x.trim()).filter(x => x != "");
         for(const line of lines){
@@ -108,11 +125,9 @@ class Slide extends Widget {
                 break;
             }
     
-            Slide.ui.explanation.setValue(TT(line));
+            textbox.setText(TT(line));
             await speech.speak_waitEnd(TT(line));
         }
-
-        Slide.ui.explanation.html().style.fontSize = font_size;
     }
 }
 
@@ -188,7 +203,6 @@ class Quiz extends Widget {
     }
 
     async play(speech : Speech){
-        this.show();
     }
 }
 
@@ -301,6 +315,8 @@ async function addQuiz(){
 }
 
 async function newLesson() {
+    updateDataByUI();
+
     const data = theLesson.makeObj();
     const doc_text = JSON.stringify(data, null, 4);
 
@@ -309,7 +325,7 @@ async function newLesson() {
 
 async function updateLesson() {
     updateDataByUI();
-    
+
     if(theDoc == undefined){
         alert("no document");
         return;
@@ -336,9 +352,42 @@ async function onFileDrop(file : File){
     return path;
 }
 
-export function makeLessonGrid(play_buttons : Flex, button_size : number) : layout_ts.Grid {
+
+export function makeLessonPlayGrid(button_size : number) : layout_ts.Grid {
+
+    root = $grid({
+        rows : `70% 30% ${button_size}px`,
+        columns : "100%",
+        children : [
+            Slide.ui.img,
+            Slide.ui.textbox,
+            $grid({
+                columns : `${button_size}px 100%`,
+                children : [
+                    playStopButton
+                    ,
+                    Slide.ui.input_range
+                ]
+            })
+
+        ]
+    })
+
+    return root;
+}
+
+
+export function makeLessonEditGrid(play_buttons : Flex, button_size : number) : layout_ts.Grid {
+    slide_play_ui = $grid({
+        rows : "70% 30%",
+        children : [
+            Slide.ui.img,
+            Slide.ui.textbox
+        ]
+    });
+
     thumbnails =$grid({
-        columns : "100px",
+        columns : "80px 80px 80px",
         children : [
         ]
     });
@@ -378,7 +427,7 @@ export function makeLessonGrid(play_buttons : Flex, button_size : number) : layo
 
     thumbnails_content = $grid({
         id : "thumbnails-content",
-        columns : "100px 100%",
+        columns : "240px 100%",
         children : [
             thumbnails,
             $label({
@@ -419,6 +468,17 @@ export function makeLessonGrid(play_buttons : Flex, button_size : number) : layo
                         text : "new doc",
                         fontSize : "large",
                         click : newLesson
+                    })
+                    ,
+                    $button({
+                        text : "Back up",
+                        fontSize : "large",
+                        click : async (ev:MouseEvent)=>{
+                            if(confirm(TT("Do you want to start the backup?"))){
+
+                                await firebase_ts.BackUp();
+                            }
+                        }
                     })
                 ]
             })
@@ -463,9 +523,25 @@ export async function readLesson(id : number) {
             msg("lesson loaded");
             theLesson = lesson;
 
-            for(const material of theLesson.materials){
-                await material.addThumbnail();
+            thumbnails.clear();
+
+            Slide.ui.input_range.setMax(theLesson.materials.length - 1);
+
+            $dlg("progress-dialog").show();
+            for(const [idx, material] of theLesson.materials.entries()){
+                const progress = 100 * idx / theLesson.materials.length;
+                $div("progress-bar-fill").style.width = `${progress}%`;
+
+                if(i18n_ts.appMode == AppMode.lessonEdit){
+                    await material.addThumbnail();
+                }
+                else{
+                    if(material instanceof Slide){
+                        material.downloadURL = await material.getDownloadURL();
+                    }
+                }
             }
+            $dlg("progress-dialog").close();
         }
         else{
             throw new MyError();
@@ -483,21 +559,65 @@ export async function playLesson(){
 
     speech = new Speech();
 
-    for(const material of theLesson.materials){
+    let start_idx = 0;
+    if(i18n_ts.appMode == AppMode.lessonEdit){
+
+        if(current != undefined){
+            start_idx = theLesson.materials.indexOf(current);
+            assert(start_idx != -1);
+
+            current = undefined;
+        }
+    }
+    else{
+        start_idx = Slide.ui.input_range.getValue();
+        assert(start_idx == Math.floor(start_idx) && 0 <= start_idx && start_idx < theLesson.materials.length);
+    }
+
+    for(const [idx, material] of theLesson.materials.entries()){
+        if(idx < start_idx){
+            continue;
+        }
         if(stopPlayFlag){
             msg("stop by flag");
             break;
         }
+        Slide.ui.input_range.setValue(idx);
 
-        await material.play(speech);
+        if(material instanceof Slide){
+
+            if(i18n_ts.appMode == AppMode.lessonEdit){
+                setEditUI(slide_play_ui);
+            }
+
+            await material.play(speech, Slide.ui.img, Slide.ui.textbox);
+        }
+        else if(material instanceof Quiz){
+
+        }
     }
-    msg("play lesson completes");
 
     Plane.one.playMode = PlayMode.stop;
+    playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
+    msg("play lesson completes");
 }
 
 export async function stopLesson(){
     cancelSpeech();
+}
+
+export async function initLessonPlay(){
+    const root_folder = await firebase_ts.getRootFolder();
+    let doc_id : number;
+
+    const lessonId = urlParams.get("lesson");
+    switch(lessonId){
+    case "genki-navi-1": doc_id = 3; break;
+    case "genki-navi-2": doc_id = 4; break;
+    default: return;
+    }
+
+    await readLesson(doc_id);
 }
 
 export function initLesson(){
