@@ -15,6 +15,9 @@ const PlayMode = plane_ts.PlayMode;
 export const AppMode = i18n_ts.AppMode;
 
 export async function bodyOnLoad(){
+    [ urlOrigin, , urlParams] = i18n_ts.parseURL();
+    msg(`params:${JSON.stringify(urlParams) }`);
+
     document.body.style.color = layout_ts.fgColor;
     document.body.style.backgroundColor = layout_ts.bgColor;
 
@@ -37,15 +40,16 @@ export async function bodyOnLoad(){
     if(voice_lang != undefined){
         voiceLanguageCode = voice_lang;
     }
+    if(urlParams.get("lesson") != undefined || urlParams.get("mode") == "lesson"){
+
+        voiceLanguageCode = "jpn";
+    }
 
     if(text_lang != undefined){
         i18n_ts.setTextLanguageCode(text_lang);
     }
 
-    msg(`lang voice:${voice_lang} text:${text_lang} nav:${navigator.language}`);
-
-    [ urlOrigin, , urlParams] = i18n_ts.parseURL();
-    msg(`params:${JSON.stringify(urlParams) }`);
+    msg(`lang voice:${voiceLanguageCode} text:${text_lang} nav:${navigator.language}`);
 
     i18n_ts.initI18n();
 
