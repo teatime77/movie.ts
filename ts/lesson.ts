@@ -30,6 +30,21 @@ let speech : Speech;
 
 let slide_play_ui : layout_ts.Grid;
 
+async function sliderChanged(ev : Event){
+    assert(i18n_ts.appMode == AppMode.lessonPlay);
+
+    const idx = Slide.ui.input_range.getValue();
+    assert(idx == Math.floor(idx));
+
+    if(theLesson != undefined && 0 <= idx && idx < theLesson.materials.length){
+        const material = theLesson.materials[idx];
+        if(material instanceof Slide){
+
+            Slide.ui.img.setImgUrl(material.downloadURL);
+        }
+    }
+}
+
 class Slide extends Widget {
     static ui = { 
         img : $img({ imgUrl : ""}),
@@ -42,7 +57,8 @@ class Slide extends Widget {
             value : 0,
             step : 1,
             min : 0,
-            max : 20
+            max : 20,
+            change : sliderChanged
         }),
         explanation : $textarea({
             id : "slide-text",
@@ -523,7 +539,9 @@ export async function readLesson(id : number) {
             msg("lesson loaded");
             theLesson = lesson;
 
-            thumbnails.clear();
+            if(thumbnails != undefined){
+                thumbnails.clear();
+            }
 
             Slide.ui.input_range.setMax(theLesson.materials.length - 1);
 
@@ -545,6 +563,14 @@ export async function readLesson(id : number) {
         }
         else{
             throw new MyError();
+        }
+
+        if(theLesson.materials.length != 0){
+            const material = theLesson.materials[0];
+            if(material instanceof Slide){
+                Slide.ui.img.setImgUrl(material.downloadURL);
+                Slide.ui.textbox.setText("");
+            }
         }
 
         root.updateRootLayout();

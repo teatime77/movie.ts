@@ -165,7 +165,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
 
         this.prevCharIndex = 0;
     
-        const uttr = new SpeechSynthesisUtterance(text);
+        const uttr = new SpeechSynthesisUtterance(text.replaceAll("○", "マル").replaceAll("×", "バツ"));
 
         uttr.addEventListener("end", this.onEnd.bind(this));
         uttr.addEventListener("boundary", this.onBoundary.bind(this));
