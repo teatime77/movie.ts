@@ -49,7 +49,7 @@ class Slide extends Widget {
     static ui = { 
         img : $img({ imgUrl : ""}),
         textbox : $textbox({
-            text : "",
+            text : "ダウンロードが始まるまで<br/>お待ちください・・・",
             fontSize : "xxx-large",
             textAlign : "center",
         }),
@@ -572,6 +572,8 @@ export async function readLesson(id : number) {
                 Slide.ui.textbox.setText("");
             }
         }
+
+        playStopButton.button.style.visibility = "visible";
 
         root.updateRootLayout();
     }

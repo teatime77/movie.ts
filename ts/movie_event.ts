@@ -168,6 +168,7 @@ export async function bodyOnLoad(){
     case AppMode.lessonPlay:
         initLesson();
         root = makeLessonPlayGrid(button_size);
+        playStopButton.button.style.visibility = "hidden";
         break;
     
     case AppMode.lessonEdit:
