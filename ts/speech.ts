@@ -206,7 +206,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
     }
 
     onEnd(ev: SpeechSynthesisEvent) : void {
-        msg(`Speech end: idx:${ev.charIndex} name:${ev.name} type:${ev.type} text:[${this.text.substring(this.prevCharIndex)}]`);
+        // msg(`Speech end: idx:${ev.charIndex} name:${ev.name} type:${ev.type} text:[${this.text.substring(this.prevCharIndex)}]`);
         if(this.callback != undefined){
             this.callback(this.text.length);
         }

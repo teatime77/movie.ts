@@ -184,6 +184,8 @@ export async function playView(play_mode : PlayMode) {
 
     Plane.one.clearNarrationBox();
 
+    plane_ts.initRelations();
+
     // media_ts.recordAudio();
     // await media_ts.startAudioRecorder();
 
@@ -198,6 +200,8 @@ export async function playView(play_mode : PlayMode) {
         View.current.shapes.push(shape);
 
         shape.allShapes().forEach(x => x.show());
+
+        shape.setRelations();
 
         if(shape.mute){
             continue;

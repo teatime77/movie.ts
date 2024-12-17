@@ -203,6 +203,8 @@ export async function bodyOnLoad(){
     msg(`size:${size.width_cm.toFixed(1)} ${size.height_cm.toFixed(1)}`);
     msg(`navigator:${navigator.appVersion}`);
 
+    plane_ts.initRelations();
+
     const doc_id = urlParams.get("id");
     if(doc_id != undefined){
 
