@@ -28,6 +28,13 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                     $flex({
                         children : [
                             $button({
+                                text : "create doc",
+                                click : async (ev:MouseEvent)=>{
+                                    createDoc();
+                                }
+                            })
+                            ,
+                            $button({
                                 text : "update doc",
                                 click : async (ev:MouseEvent)=>{
                                     updateDoc();

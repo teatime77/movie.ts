@@ -23,9 +23,6 @@ const parseMath = parser_ts.parseMath;
 const Plane = plane_ts.Plane;
 const View = plane_ts.View;
 
-type Reason = plane_ts.Reason;
-const Reason = plane_ts.Reason;
-
 type Shape = plane_ts.Shape;
 const Shape = plane_ts.Shape;
 

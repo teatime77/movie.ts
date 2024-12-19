@@ -234,6 +234,15 @@ export async function readDoc(id : number) {
     }
 }
 
+export async function createDoc() {
+    const doc_text = plane_ts.View.getJson();
+    if(doc_text == ""){
+        return;
+    }
+
+    firebase_ts.showContents(undefined, doc_text);
+}
+
 export async function updateDoc(){
     const user = firebase_ts.getUser();
     if(user == null){
