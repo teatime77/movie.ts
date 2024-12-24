@@ -88,6 +88,13 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                                     layout_ts.Log.show(ev);
                                 }
                             })
+                            ,
+                            $button({
+                                text : "copy all",
+                                click : async (ev:MouseEvent)=>{
+                                    await copyAll();
+                                }
+                            })
                         ],
                     })
                 ]

@@ -61,7 +61,6 @@ export async function doGenerator(iterator : Generator, timeout : number){
         
                 clearInterval(timer_id);
                 resolve(undefined);
-                console.log("ジェネレータ 終了");
             }        
         }, timeout);    
     });
