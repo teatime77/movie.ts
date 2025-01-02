@@ -243,6 +243,15 @@ export async function createDoc() {
     firebase_ts.showContents(undefined, doc_text);
 }
 
+export async function uploadThumbnail(){
+    if(theDoc == undefined){
+        alert("no document");
+        return;
+    }
+
+    await firebase_ts.uploadCanvasImg(theDoc.id, View.current.canvas.canvas);
+}
+
 export async function updateDoc(){
     const user = firebase_ts.getUser();
     if(user == null){
@@ -267,6 +276,8 @@ export async function updateDoc(){
     theDoc.setName(name);
     theDoc.text = json;
     await theDoc.updateDocDB();
+
+    await uploadThumbnail();
 }
 
 export function SignUp(){
