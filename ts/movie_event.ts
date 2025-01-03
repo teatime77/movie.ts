@@ -182,7 +182,7 @@ export async function bodyOnLoad(){
         break;
     }
 
-    layout_ts.Layout.initLayout(root);
+    // layout_ts.Layout.initLayout(root);
 
     plane_ts.initPlane(plane, root);
     
@@ -221,6 +221,8 @@ export async function bodyOnLoad(){
     if(i18n_ts.appMode == AppMode.lessonPlay){
         await initLessonPlay();
     }
+
+    await firebase_ts.makeDocsFromRootFolder();
 }
 
 export async function readDoc(id : number) {

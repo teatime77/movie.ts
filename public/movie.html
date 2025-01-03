@@ -40,6 +40,9 @@
     onload="renderMathInElement(document.body);"></script>
 <!------------------------------------ katex end   -------------------------------------->
 
+<script type="text/javascript" src="lib/firebase/viz-standalone.js"></script>
+
+
 <script type="text/javascript" src="lib/i18n/i18n.js?ver=1"></script>
 <script type="text/javascript" src="lib/layout/layout.js?ver=1"></script>
 <script type="text/javascript" src="lib/parser/parser.js?ver=1"></script>
@@ -81,7 +84,20 @@ body {
 
 
 </style>
+<style>
+.menu_dlg {
+    position: absolute; 
+    margin: 0;
+}
 
+.mn1 {
+    display: inline-block;
+    margin-left: 10px;
+    cursor:pointer;
+    white-space: nowrap;
+}
+</style>
+    
 </head>
 <body>
 <div id="katex-div" style="display: none; width: 1280px;; height: 670px; overflow-y: scroll;" ></div>
@@ -119,6 +135,25 @@ body {
             <div class="progress-bar-fill" id="progress-bar-fill"></div>
         </div>
     </div>
+</dialog>
+
+<dialog id="graph-menu-dlg" class="menu_dlg">
+    <span class="mn1" onclick="firebase_ts.addGraphSection()">セクションを追加</span><br/>
+    <span class="mn1" onclick="firebase_ts.addGraphItem()">項目を追加</span><br/>
+    <span class="mn1" onclick="firebase_ts.changeDisplay()">表示切替</span><br/>
+    <span class="mn1" id="connect-edge">接続</span><br/>
+    <span class="mn1" id="remove-from-section">除去</span><br/>
+    <span class="mn1" id="update-graph">保存</span>
+</dialog>
+
+<dialog id="graph-section-menu-dlg" class="menu_dlg">
+  <span class="mn1" id="add-section-to-section">セクションを追加</span><br/>
+  <span class="mn1" id="add-item-to-section">項目を追加</span><br/>
+  <span class="mn1" id="append-to-section" >追加</span><br/>
+</dialog>
+
+<dialog id="graph-edge-menu-dlg" class="menu_dlg">
+  <span class="mn1" id="delete-edge">除去</span>
 </dialog>
 
 </body>
