@@ -182,7 +182,7 @@ export async function bodyOnLoad(){
         break;
     }
 
-    // layout_ts.Layout.initLayout(root);
+    layout_ts.Layout.initLayout(root);
 
     plane_ts.initPlane(plane, root);
     
@@ -193,6 +193,7 @@ export async function bodyOnLoad(){
     initSpeech();
 
     await firebase_ts.initFirebase();
+    firebase_ts.readDocFnc = readDoc;
 
     if(i18n_ts.appMode == AppMode.lessonPlay){
         firebase_ts.refId = "wutfxujVE0GGD5YW";
@@ -222,7 +223,7 @@ export async function bodyOnLoad(){
         await initLessonPlay();
     }
 
-    await firebase_ts.makeDocsFromRootFolder();
+    await firebase_ts.makeDocsGraph();
 }
 
 export async function readDoc(id : number) {
