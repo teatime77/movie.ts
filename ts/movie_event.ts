@@ -247,12 +247,18 @@ export async function createDoc() {
 }
 
 export async function uploadThumbnail(){
-    if(theDoc == undefined){
-        alert("no document");
+    await firebase_ts.uploadCanvasImg(View.current.canvas.canvas);
+}
+
+export async function updateGraphDoc(){
+    const json_text = plane_ts.View.getJson();
+    if(json_text == ""){
         return;
     }
 
-    await firebase_ts.uploadCanvasImg(theDoc.id, View.current.canvas.canvas);
+    await firebase_ts.writeGraphDocDB(json_text);
+
+    await uploadThumbnail();
 }
 
 export async function updateDoc(){

@@ -143,11 +143,18 @@ body {
     <span class="mn1" onclick="firebase_ts.changeDisplay()">表示切替</span><br/>
     <span class="mn1" id="connect-edge">接続</span><br/>
     <span class="mn1" id="remove-from-section">除去</span><br/>
-    <span class="mn1" id="update-graph">保存</span>
+    <span class="mn1" id="update-graph">保存</span><br/>
+    <span class="mn1" onclick="movie_ts.playAllGraph()">play all graph</span><br/>
 </dialog>
 
+<dialog id="graph-doc-menu-dlg" class="menu_dlg">
+    <span class="mn1" onclick="firebase_ts.renameDoc()">名前を変更</span><br/>
+    <span class="mn1" onclick="firebase_ts.deleteDoc()">削除</span><br/>
+  </dialog>
+  
 <dialog id="graph-section-menu-dlg" class="menu_dlg">
   <span class="mn1" id="add-section-to-section">セクションを追加</span><br/>
+  <span class="mn1" onclick="firebase_ts.renameSection()">セクションの名前を変更</span><br/>
   <span class="mn1" id="add-item-to-section">項目を追加</span><br/>
   <span class="mn1" id="append-to-section" >追加</span><br/>
 </dialog>

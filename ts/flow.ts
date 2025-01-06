@@ -317,6 +317,21 @@ export async function playAll(){
     $dlg("lang-texts-dlg").showModal();
 }
 
+export async function playAllGraph(){
+    firebase_ts.hideGraph();
+
+    docSpeeches = [];
+    const graph = firebase_ts.getGraph();
+    for(const doc of graph.docs){
+        await readDoc(doc.id);
+        await playView(PlayMode.playAll);
+    }
+
+    firebase_ts.showGraph();
+
+    msg("play all done.");
+}
+
 export async function convert(){
     const user = firebase_ts.getUser();
     if(user == null){
