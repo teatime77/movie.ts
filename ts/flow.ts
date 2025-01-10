@@ -200,9 +200,9 @@ export async function playView(play_mode : PlayMode) {
 
         shape.setRelations();
 
-        if(Plane.one.playMode == PlayMode.playAll && shape instanceof plane_ts.LengthEquality){
-            const lengthEquality = shape.verify();
-            if(lengthEquality == undefined){
+        if(Plane.one.playMode == PlayMode.playAll && (shape instanceof plane_ts.LengthEquality || shape instanceof plane_ts.AngleEquality) ){
+            const equality = shape.verify();
+            if(equality == undefined){
                 shape.verify();
             }
         }
