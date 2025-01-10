@@ -200,6 +200,13 @@ export async function playView(play_mode : PlayMode) {
 
         shape.setRelations();
 
+        if(Plane.one.playMode == PlayMode.playAll && shape instanceof plane_ts.LengthEquality){
+            const lengthEquality = shape.verify();
+            if(lengthEquality == undefined){
+                shape.verify();
+            }
+        }
+
         if(shape.mute){
             continue;
         }

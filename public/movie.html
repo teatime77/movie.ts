@@ -43,13 +43,13 @@
 <script type="text/javascript" src="lib/firebase/viz-standalone.js"></script>
 
 
-<script type="text/javascript" src="lib/i18n/i18n.js?ver=1"></script>
-<script type="text/javascript" src="lib/layout/layout.js?ver=1"></script>
-<script type="text/javascript" src="lib/parser/parser.js?ver=1"></script>
-<script type="text/javascript" src="lib/plane/plane.js?ver=1"></script>
-<script type="text/javascript" src="lib/firebase/firebase.js?ver=1"></script>
-<script type="text/javascript" src="lib/media/media.js?ver=1"></script>
-<script type="text/javascript" src="lib/movie/movie.js?ver=1"></script>
+<script type="text/javascript" src="lib/i18n/i18n.js?ver=2"></script>
+<script type="text/javascript" src="lib/layout/layout.js?ver=2"></script>
+<script type="text/javascript" src="lib/parser/parser.js?ver=2"></script>
+<script type="text/javascript" src="lib/plane/plane.js?ver=2"></script>
+<script type="text/javascript" src="lib/firebase/firebase.js?ver=2"></script>
+<script type="text/javascript" src="lib/media/media.js?ver=2"></script>
+<script type="text/javascript" src="lib/movie/movie.js?ver=2"></script>
 
 
 <style type="text/css">
@@ -90,7 +90,7 @@ body {
     margin: 0;
 }
 
-.mn1 {
+.menu_item {
     display: inline-block;
     margin-left: 10px;
     cursor:pointer;
@@ -138,29 +138,33 @@ body {
 </dialog>
 
 <dialog id="graph-menu-dlg" class="menu_dlg">
-    <span class="mn1" onclick="firebase_ts.addGraphSection()">セクションを追加</span><br/>
-    <span class="mn1" onclick="firebase_ts.addGraphItem()">項目を追加</span><br/>
-    <span class="mn1" onclick="firebase_ts.changeDisplay()">表示切替</span><br/>
-    <span class="mn1" id="connect-edge">接続</span><br/>
-    <span class="mn1" id="remove-from-section">除去</span><br/>
-    <span class="mn1" id="update-graph">保存</span><br/>
-    <span class="mn1" onclick="movie_ts.playAllGraph()">play all graph</span><br/>
+    <span class="menu_item" onclick="firebase_ts.addGraphSection()">セクションを追加</span><br/>
+    <span class="menu_item" onclick="firebase_ts.addGraphItem()">項目を追加</span><br/>
+    <span class="menu_item" onclick="firebase_ts.changeDisplay()">表示切替</span><br/>
+    <span class="menu_item" id="connect-edge">接続</span><br/>
+    <span class="menu_item" id="remove-from-section">除去</span><br/>
+    <span class="menu_item" id="update-graph">保存</span><br/>
+    <span class="menu_item" onclick="movie_ts.playAllGraph()">play all graph</span><br/>
 </dialog>
 
 <dialog id="graph-doc-menu-dlg" class="menu_dlg">
-    <span class="mn1" onclick="firebase_ts.renameDoc()">名前を変更</span><br/>
-    <span class="mn1" onclick="firebase_ts.deleteDoc()">削除</span><br/>
+    <span class="menu_item" onclick="firebase_ts.renameDoc()">名前を変更</span><br/>
+    <span class="menu_item" onclick="firebase_ts.deleteDoc()">削除</span><br/>
   </dialog>
   
 <dialog id="graph-section-menu-dlg" class="menu_dlg">
-  <span class="mn1" id="add-section-to-section">セクションを追加</span><br/>
-  <span class="mn1" onclick="firebase_ts.renameSection()">セクションの名前を変更</span><br/>
-  <span class="mn1" id="add-item-to-section">項目を追加</span><br/>
-  <span class="mn1" id="append-to-section" >追加</span><br/>
+  <span class="menu_item" id="add-section-to-section">セクションを追加</span><br/>
+  <span class="menu_item" onclick="firebase_ts.renameSection()">セクションの名前を変更</span><br/>
+  <span class="menu_item" id="add-item-to-section">項目を追加</span><br/>
+  <span class="menu_item" id="append-to-section" >追加</span><br/>
 </dialog>
 
 <dialog id="graph-edge-menu-dlg" class="menu_dlg">
-  <span class="mn1" id="delete-edge">除去</span>
+  <span class="menu_item" id="delete-edge">除去</span>
+</dialog>
+
+<dialog id="help-dlg" style="position: fixed; right: 20px; bottom: 20px; z-index: 10;" >
+    <span id="help-msg"></span>
 </dialog>
 
 <button id="close-graph" style="display: none; position: fixed; top:10px; right: 10px; z-index: 10;">×</button>

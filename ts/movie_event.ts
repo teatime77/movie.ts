@@ -222,8 +222,10 @@ export async function bodyOnLoad(){
     if(i18n_ts.appMode == AppMode.lessonPlay){
         await initLessonPlay();
     }
+    else if(i18n_ts.appMode != AppMode.lessonEdit){
 
-    await firebase_ts.makeDocsGraph();
+        await firebase_ts.makeDocsGraph();
+    }
 }
 
 export async function readDoc(id : number) {
