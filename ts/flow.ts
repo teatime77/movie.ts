@@ -301,18 +301,10 @@ export function stopPlay(){
 
 export async function playAll(){
     docSpeeches = [];
-
-    const items = await firebase_ts.getAllDbItems();
-    const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
-
     
-    for(const db_doc of db_docs){
-        const eng_texts_prev = i18n_ts.getEngTexts().slice();
-
-        await readDoc(db_doc.id);
+    for(const doc of firebase_ts.graph.docs){
+        await readDoc(doc.id);
         await playView(PlayMode.playAll);
-
-        const eng_texts_new = i18n_ts.getEngTexts();
     }
 
     const eng_texts = i18n_ts.getEngTexts();
@@ -344,12 +336,9 @@ export async function convert(){
     if(user == null){
         throw new MyError();
     }
-
-    const items = await firebase_ts.getAllDbItems();
-    const db_docs : DbDoc[] = items.filter(x => x instanceof DbDoc) as DbDoc[];
     
-    for(const db_doc of db_docs){
-        await readDoc(db_doc.id);
+    for(const doc of firebase_ts.graph.docs){
+        await readDoc(doc.id);
         if(theDoc == undefined){
             throw new MyError();
         }
