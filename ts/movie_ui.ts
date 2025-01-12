@@ -43,13 +43,6 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                             })
                             ,
                             $button({
-                                text : "play all",
-                                click : async (ev:MouseEvent)=>{
-                                    await playAll();
-                                }
-                            })
-                            ,
-                            $button({
                                 text : "edit contents",
                                 click : async (ev:MouseEvent)=>{
                                     await firebase_ts.showContents(undefined, undefined);

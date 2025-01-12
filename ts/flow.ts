@@ -299,34 +299,27 @@ export function stopPlay(){
     stopPlayFlag = true;
 }
 
-export async function playAll(){
-    docSpeeches = [];
-    
-    for(const doc of firebase_ts.graph.docs){
-        await readDoc(doc.id);
-        await playView(PlayMode.playAll);
-    }
-
-    const eng_texts = i18n_ts.getEngTexts();
-    const all_texts =  Array.from( eng_texts.entries() ).map(x=>`${x[0]}:${x[1]}`).join("\n\n");
-
-    const doc_speeches = JSON.stringify(docSpeeches, null, 4);
-
-    ($("lang-texts-text") as HTMLTextAreaElement).value = doc_speeches;
-    $dlg("lang-texts-dlg").showModal();
-}
-
 export async function playAllGraph(){
     firebase_ts.hideGraph();
 
     docSpeeches = [];
     const graph = firebase_ts.getGraph();
+
+    graph.docs.forEach(x => msg(`${x.id}:${x.title}`));
+
     for(const doc of graph.docs){
+        msg(`graph-doc ${doc.id}:${doc.title}`);
         await readDoc(doc.id);
         await playView(PlayMode.playAll);
     }
 
     firebase_ts.showGraph();
+
+    const eng_texts = i18n_ts.getEngTexts();
+    msg(`eng-texts:[${eng_texts}]`);
+
+    ($("lang-texts-text") as HTMLTextAreaElement).value = eng_texts;
+    $dlg("lang-texts-dlg").showModal();
 
     msg("play all done.");
 }
