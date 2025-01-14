@@ -43,13 +43,13 @@
 <script type="text/javascript" src="lib/firebase/viz-standalone.js"></script>
 
 
-<script type="text/javascript" src="lib/i18n/i18n.js?ver=2"></script>
-<script type="text/javascript" src="lib/layout/layout.js?ver=2"></script>
-<script type="text/javascript" src="lib/parser/parser.js?ver=2"></script>
-<script type="text/javascript" src="lib/plane/plane.js?ver=2"></script>
-<script type="text/javascript" src="lib/firebase/firebase.js?ver=2"></script>
-<script type="text/javascript" src="lib/media/media.js?ver=2"></script>
-<script type="text/javascript" src="lib/movie/movie.js?ver=2"></script>
+<script type="text/javascript" src="lib/i18n/i18n.js?ver=1"></script>
+<script type="text/javascript" src="lib/layout/layout.js?ver=1"></script>
+<script type="text/javascript" src="lib/parser/parser.js?ver=1"></script>
+<script type="text/javascript" src="lib/plane/plane.js?ver=1"></script>
+<script type="text/javascript" src="lib/firebase/firebase.js?ver=1"></script>
+<script type="text/javascript" src="lib/media/media.js?ver=1"></script>
+<script type="text/javascript" src="lib/movie/movie.js?ver=1"></script>
 
 
 <style type="text/css">
@@ -143,7 +143,7 @@ body {
     <span class="menu_item" onclick="firebase_ts.changeDisplay()">表示切替</span><br/>
     <span class="menu_item" id="connect-edge">接続</span><br/>
     <span class="menu_item" id="remove-from-section">除去</span><br/>
-    <span class="menu_item" id="update-graph">保存</span><br/>
+    <span class="menu_item" onclick="firebase_ts.updateGraph()">update graph</span><br/>
     <span class="menu_item" onclick="movie_ts.playAllGraph()">play all graph</span><br/>
 </dialog>
 

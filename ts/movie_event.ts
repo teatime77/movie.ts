@@ -228,14 +228,14 @@ export async function bodyOnLoad(){
     }
 }
 
-export async function readDoc(id : number) {
+export async function readDoc(doc_id : number) {
     // msg(`id:${id}`);
-    theDoc = await firebase_ts.getDoc(id);
+    theDoc = await firebase_ts.getDoc(doc_id);
     if(theDoc != undefined){
 
         // msg(`read doc:${theDoc.id} ${theDoc.name}`)
         const obj = JSON.parse(theDoc.text);
-        plane_ts.loadData(obj);
+        plane_ts.loadData(doc_id, obj);
     }
 }
 

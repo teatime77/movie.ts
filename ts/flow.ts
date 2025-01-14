@@ -305,21 +305,55 @@ export async function playAllGraph(){
     docSpeeches = [];
     const graph = firebase_ts.getGraph();
 
+    const edge_map = new Map<string, firebase_ts.Edge>();
+
     graph.docs.forEach(x => msg(`${x.id}:${x.title}`));
 
     for(const doc of graph.docs){
         msg(`graph-doc ${doc.id}:${doc.title}`);
+        
+        plane_ts.usedReasons.clear();
+
         await readDoc(doc.id);
         await playView(PlayMode.playAll);
+
+        for(const reason of plane_ts.usedReasons){
+            const reason_doc_id = plane_ts.reasonToDoc.get(reason);
+            if(reason_doc_id != undefined){
+                const reason_doc = graph.getDocById(reason_doc_id)!;
+                assert(reason_doc != undefined);
+
+                const edge = new firebase_ts.Edge(reason_doc, doc);
+                edge_map.set(edge.key(), edge);
+            }        
+        }
     }
+
+    const predifned_edges = [
+        [7, 8]  // 8 : AngleEqualityReason.vertical_angles
+    ];
+    for(const [src_id, dst_id] of predifned_edges){
+        const src_doc = graph.getDocById(src_id)!;
+        const dst_doc = graph.getDocById(dst_id)!;
+        assert(src_doc != undefined && dst_doc != undefined);
+
+        const edge = new firebase_ts.Edge(src_doc, dst_doc);
+        edge_map.set(edge.key(), edge);
+    }
+
+    graph.edgeMap = edge_map;
+    graph.makeViz();
 
     firebase_ts.showGraph();
 
     const eng_texts = i18n_ts.getEngTexts();
-    msg(`eng-texts:[${eng_texts}]`);
+    if(eng_texts != ""){
 
-    ($("lang-texts-text") as HTMLTextAreaElement).value = eng_texts;
-    $dlg("lang-texts-dlg").showModal();
+        msg(`eng-texts:[${eng_texts}]`);
+
+        ($("lang-texts-text") as HTMLTextAreaElement).value = eng_texts;
+        $dlg("lang-texts-dlg").showModal();
+    }
 
     msg("play all done.");
 }
