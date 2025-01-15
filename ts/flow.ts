@@ -330,8 +330,10 @@ export async function playAllGraph(){
     }
 
     const predifned_edges = [
-        [7, 8]  // 8 : AngleEqualityReason.vertical_angles
+        [7, 8],     // 8 : AngleEqualityReason.vertical_angles
+        [50, 52],   // Angle bisector => The bisector of the apex angle of an isosceles triangle bisects the base perpendicularly.
     ];
+    
     for(const [src_id, dst_id] of predifned_edges){
         const src_doc = graph.getDocById(src_id)!;
         const dst_doc = graph.getDocById(dst_id)!;
