@@ -294,6 +294,18 @@ function setEditUI(ui : layout_ts.UI){
     thumbnails_content.addChild(ui);
 }
 
+async function speakSlide() {
+    const text = Slide.ui.explanation.getValue();
+    speech = new Speech();
+    for(const line of text.split("\n")){
+        if(line.trim() == ""){
+            continue;
+        }
+        await speech.speak(line.trim());
+        await speech.waitEnd();
+    }
+}
+
 async function addSlide(){
     updateDataByUI();
 
@@ -462,6 +474,12 @@ export function makeLessonEditGrid(play_buttons : Flex, button_size : number) : 
         children : [        
             $flex({
                 children : [
+                    $button({
+                        text : "speak",
+                        fontSize : "large",
+                        click : speakSlide
+                    })
+                    ,
                     $button({
                         text : "add slide",
                         fontSize : "large",
