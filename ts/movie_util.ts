@@ -50,22 +50,6 @@ export function range(n: number) : number[]{
     return [...Array(n).keys()];
 }
 
-
-
-
-export async function doGenerator(iterator : Generator, timeout : number){
-    return new Promise((resolve)=>{
-        const timer_id = setInterval(()=>{
-            if(iterator.next().done){
-                // ジェネレータが終了した場合
-        
-                clearInterval(timer_id);
-                resolve(undefined);
-            }        
-        }, timeout);    
-    });
-}
-
 export async function fetchText(fileURL: string) {
     const response = await fetch(fileURL);
     const text = await response!.text();

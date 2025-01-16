@@ -142,7 +142,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
         }, 1);
     }
 
-    speak(text : string) : void {
+    async speak(text : string) : Promise<void> {
         this.speaking = true;
         this.text = text;
         Plane.one.narration_box.setText(text);
@@ -156,8 +156,10 @@ export class Speech extends i18n_ts.AbstractSpeech {
         }
 
         if(speech_id != undefined){
-            playAudio(this, speech_id);
-            return;
+            const ok = await playAudio(this, speech_id);
+            if(ok){
+                return;
+            }
         }
 
         this.initVoice();
@@ -179,13 +181,6 @@ export class Speech extends i18n_ts.AbstractSpeech {
         }
 
         speechSynthesis.speak(uttr);
-    }
-
-    * genSpeak(text : string){
-        this.speak(text);
-        while(this.speaking){
-            yield;
-        }
     }
 
     onBoundary(ev: SpeechSynthesisEvent) : void {
@@ -228,7 +223,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
     }
 
     async speak_waitEnd(text : string){
-        this.speak(text);
+        await this.speak(text);
         await this.waitEnd();
     }
 }

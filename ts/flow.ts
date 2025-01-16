@@ -68,7 +68,7 @@ export async function playStatement(statement : Statement, speech : Speech) {
 }
 
 async function speakAndHighlight(shape : MathEntity, speech : Speech, lines : string[]){
-    speech.speak(lines.shift()!.trim());
+    await speech.speak(lines.shift()!.trim());
 
     for(const dep of shape.dependencies()){
         if(dep instanceof SelectedShape){
@@ -89,7 +89,7 @@ async function speakAndHighlight(shape : MathEntity, speech : Speech, lines : st
         const line = lines.shift()!.trim();
         if(line != ""){
             await speech.waitEnd();
-            speech.speak(line);
+            await speech.speak(line);
         }
     }
 
@@ -119,7 +119,7 @@ async function generateTex(shape : TextBlock | Statement, speech : Speech, named
 
         const term = parseMath(text);
 
-        await doGenerator( parser_ts.showFlow(speech, term, div, named_all_shape_map), 1 );
+        await parser_ts.showFlow(speech, term, div, named_all_shape_map);
 
     }
     catch(e){
@@ -213,8 +213,8 @@ export async function playView(play_mode : PlayMode) {
 
         let highlighted = new Set<Reading>();
 
-        if(shape instanceof TriangleCongruence){
-            await shape.asyncPlay(speech);
+        if(shape instanceof Statement){
+            await shape.showReasonAndStatement(speech);
         }
         else if(shape instanceof Motion){
             await shape.animate(speech);
@@ -256,7 +256,7 @@ export async function playView(play_mode : PlayMode) {
                 }
 
                 if(text != ""){
-                    speech.speak(TT(text));
+                    await speech.speak(TT(text));
                 }                
             }
         }
