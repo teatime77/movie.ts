@@ -82,6 +82,25 @@ body {
     background-color: #4CAF50;
 }
 
+.tooltip {
+    display: none;
+    position: absolute;
+    top: -20px; 
+    left: 0;
+    background-color: cornsilk;
+    color: black;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 24px;
+    z-index: 10;
+    border-style: ridge;
+    border-width: 3px;
+}
+
+img:hover + .tooltip {
+    display: block;
+}
+
 
 </style>
 <style>
