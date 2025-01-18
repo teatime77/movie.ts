@@ -167,6 +167,14 @@ export async function playView(play_mode : PlayMode) {
 
     const speech = new Speech();
 
+    let start_shape_idx = 0;
+    if(View.current.undoStack.length != 0){
+        start_shape_idx = View.current.shapes.length;
+        while(View.current.undoStack.length != 0){
+            View.current.redo();
+        }
+    }
+
     const all_shapes = View.current.allShapes();
     all_shapes.forEach(x => x.hide());
 
@@ -182,7 +190,7 @@ export async function playView(play_mode : PlayMode) {
     // media_ts.recordAudio();
     // await media_ts.startAudioRecorder();
 
-    for(const shape of view_shapes){
+    for(const [shape_idx, shape] of view_shapes.entries()){
         if(stopPlayFlag){
             stopPlayFlag = false;
             msg("stop play");
@@ -203,7 +211,7 @@ export async function playView(play_mode : PlayMode) {
             }
         }
 
-        if(shape.mute){
+        if(shape.mute || shape_idx < start_shape_idx){
             continue;
         }
 
