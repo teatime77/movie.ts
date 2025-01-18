@@ -176,12 +176,8 @@ export async function playView(play_mode : PlayMode) {
     named_all_shapes.forEach(x => named_all_shape_map.set(x.name, x));
 
     const view_shapes = View.current.shapes.slice();
-    View.current.shapes = [];
-    View.current.dirty = true;
 
-    Plane.one.clearNarrationBox();
-
-    plane_ts.initRelations();
+    View.current.clearView();
 
     // media_ts.recordAudio();
     // await media_ts.startAudioRecorder();

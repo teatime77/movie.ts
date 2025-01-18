@@ -229,6 +229,7 @@ export async function bodyOnLoad(){
 }
 
 export async function readDoc(doc_id : number) {
+    View.current.clearView();
     // msg(`id:${id}`);
     theDoc = await firebase_ts.getDoc(doc_id);
     if(theDoc != undefined){
