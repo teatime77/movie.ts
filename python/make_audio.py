@@ -9,8 +9,8 @@ with open("data/info.json", 'r', encoding='utf-8') as file:
     info = json.load(file)
 
 # Replace with your subscription key and service region
-subscription_key = info.subscription_key
-region = info.region
+subscription_key = info["subscription_key"]
+region = info["region"]
 
 lang_list : list[tuple[str, str]] = [
     ("ara", "ar-EG", "SalmaNeural"),
@@ -41,14 +41,6 @@ lang_dic = {
     "spa" : "spa",
     "por" : "por",
 }
-
-
-
-
-
-
-
-
 
 
 lang_list2 = [x[:2] for x in lang_list]
@@ -126,6 +118,9 @@ def list_voices(lang_code : str):
 
 
 def make_audio_files(mode, code3, voice_name):
+    target_dir = f'../../firebase.ts/public/lib/i18n/audio/{code3}'
+
+
     text_path = f"../../i18n.ts/public/lib/i18n/translation/{code3}.txt"
     with open(text_path, 'r', encoding='UTF-8') as f:
         lines = f.readlines()
@@ -140,26 +135,34 @@ def make_audio_files(mode, code3, voice_name):
         [num, text] = line.split(":")
         num  = num.strip()
         text = text.strip()
-        # if int(num) < 23:
-        if int(num) != 37:
+
+        output_filename = f'{target_dir}/{num}.mp3'
+        if os.path.isfile(output_filename):
             continue
+
+        if int(num) < 23:
+            continue
+
+        print(num, text)
 
         num_text.append([num, text])
 
     if mode == 1:
         num_text = num_text[:1]
     elif mode == 2:
-        num_text = num_text[1:10]
+        num_text = num_text[:10]
     elif mode == 3:
-        num_text = num_text[10:]
+        pass
     else:
         return
     
+    print("\nnum_text=", num_text)
     text_to_speech(num_text, code3, voice_name)
 
 
 if __name__ == '__main__':
     args = sys.argv
+    print(len(args), args[0], args[1])
     if len(args) == 3:
 
         code3      = args[1]
