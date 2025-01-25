@@ -67,7 +67,7 @@ function addTexDiv(){
 export async function playStatement(statement : Statement, speech : Speech) {
 }
 
-async function speakAndHighlight(shape : MathEntity, speech : Speech, lines : string[]){
+export async function speakAndHighlight(shape : MathEntity, speech : Speech, lines : string[]){
     await speech.speak(lines.shift()!.trim());
 
     for(const dep of shape.dependencies()){

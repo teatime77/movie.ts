@@ -35,6 +35,16 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
                             // })
                             // ,
                             $button({
+                                text : "playback",
+                                click : async(ev : MouseEvent)=>{
+            
+                                    const speech = new Speech();
+                                    
+                                    await plane_ts.playBack(speech);
+                                }
+                            })
+                            ,            
+                            $button({
                                 text : "update doc",
                                 click : async (ev:MouseEvent)=>{
                                     // updateDoc();
