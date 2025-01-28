@@ -171,7 +171,7 @@ export async function playView(play_mode : PlayMode) {
     if(View.current.undoStack.length != 0){
         start_shape_idx = View.current.shapes.length;
         while(View.current.undoStack.length != 0){
-            View.current.redo();
+            await View.current.redo();
         }
     }
 

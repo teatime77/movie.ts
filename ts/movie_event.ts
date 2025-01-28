@@ -235,8 +235,10 @@ export async function readDoc(doc_id : number) {
     if(theDoc != undefined){
 
         // msg(`read doc:${theDoc.id} ${theDoc.name}`)
-        const obj = JSON.parse(theDoc.text);
-        plane_ts.loadData(doc_id, obj);
+        // const obj = JSON.parse(theDoc.text);
+        // plane_ts.loadData(obj);
+
+        await plane_ts.loadOperationsText(theDoc.text);
     }
 }
 
@@ -254,12 +256,22 @@ export async function uploadThumbnail(){
 }
 
 export async function updateGraphDoc(){
-    const json_text = plane_ts.View.getJson();
-    if(json_text == ""){
+    const text = plane_ts.getOperationsText();
+
+    await plane_ts.loadOperationsText(text);
+
+    await firebase_ts.writeGraphDocDB(text);
+
+    await uploadThumbnail();
+}
+
+export async function updateGraphDocOld(){
+    const text = plane_ts.View.getJson();
+    if(text == ""){
         return;
     }
 
-    await firebase_ts.writeGraphDocDB(json_text);
+    await firebase_ts.writeGraphDocDB(text);
 
     await uploadThumbnail();
 }

@@ -40,7 +40,7 @@ export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button
             
                                     const speech = new Speech();
                                     
-                                    await plane_ts.playBack(speech);
+                                    await plane_ts.playBackAll(speech);
                                 }
                             })
                             ,            
