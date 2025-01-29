@@ -313,13 +313,13 @@ export async function playAllGraph(){
 
     graph.docs.forEach(x => msg(`${x.id}:${x.title}`));
 
+    Plane.one.playMode = PlayMode.playAll;
     for(const doc of graph.docs){
         msg(`graph-doc ${doc.id}:${doc.title}`);
         
         plane_ts.usedReasons.clear();
 
         await readDoc(doc.id);
-        await playView(PlayMode.playAll);
 
         for(const reason of plane_ts.usedReasons){
             const reason_doc_id = plane_ts.reasonToDoc.get(reason);
@@ -332,10 +332,13 @@ export async function playAllGraph(){
             }        
         }
     }
+    Plane.one.playMode = PlayMode.stop;
 
-    const predifned_edges = [
+    const predifned_edges : [number,number][] = [
+/*        
         [7, 8],     // 8 : AngleEqualityReason.vertical_angles
         [50, 52],   // Angle bisector => The bisector of the apex angle of an isosceles triangle bisects the base perpendicularly.
+*/        
     ];
     
     for(const [src_id, dst_id] of predifned_edges){
