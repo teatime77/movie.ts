@@ -40,9 +40,6 @@ type Statement = plane_ts.Statement;
 const TextBlock = plane_ts.TextBlock;
 type  TextBlock = plane_ts.TextBlock;
 
-type SelectedShape = plane_ts.SelectedShape;
-const SelectedShape = plane_ts.SelectedShape;
-
 const PlayMode = plane_ts.PlayMode;
 type  PlayMode = plane_ts.PlayMode;
 
@@ -71,9 +68,6 @@ export async function speakAndHighlight(shape : MathEntity, speech : Speech, lin
     await speech.speak(lines.shift()!.trim());
 
     for(const dep of shape.dependencies()){
-        if(dep instanceof SelectedShape){
-            View.current.attentionShapes.push(dep);
-        }
         
         dep.setMode(Mode.depend);
 
@@ -275,7 +269,6 @@ export async function playView(play_mode : PlayMode) {
             await generateTex(shape, speech, named_all_shape_map);
         }
 
-        View.current.attentionShapes = [];
         all_shapes.forEach(x => {x.setMode(Mode.none); });
     }
 
@@ -313,7 +306,7 @@ export async function playAllGraph(){
 
     graph.docs.forEach(x => msg(`${x.id}:${x.title}`));
 
-    Plane.one.playMode = PlayMode.playAll;
+    Plane.one.playMode = PlayMode.fastForward;
     for(const doc of graph.docs){
         msg(`graph-doc ${doc.id}:${doc.title}`);
         

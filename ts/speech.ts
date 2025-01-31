@@ -149,7 +149,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
 
         const speech_id = i18n_ts.getIdFromText(this.text);
 
-        if(Plane.one.playMode == PlayMode.playAll){
+        if(Plane.one.playMode == PlayMode.fastForward){
 
             this.emulate(speech_id);
             return;

@@ -109,28 +109,6 @@ export async function bodyOnLoad(){
 
     const play_buttons = $flex({
         children : [
-            $button({
-                id : "show-contents",
-                click : async (ev : MouseEvent)=>{
-                    switch(i18n_ts.appMode){
-                    case AppMode.edit:
-                    case AppMode.play:
-                        firebase_ts.showContents(readDoc, undefined);
-                        break;
-
-                    case AppMode.lessonEdit:
-                        firebase_ts.showContents(readLesson, undefined);
-                        break;
-                    default:
-                        throw new MyError();
-                    }
-                },
-                url    : `${urlOrigin}/lib/plane/img/bullet-list.png`,
-                margin : "auto 5px",
-                width  : `${button_size}px`,
-                height : `${button_size}px`,
-            })
-            ,
             playStopButton
             ,
             $button({
