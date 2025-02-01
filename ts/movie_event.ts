@@ -210,10 +210,17 @@ export async function readDoc(doc_id : number) {
     if(theDoc != undefined){
 
         // msg(`read doc:${theDoc.id} ${theDoc.name}`)
-        // const obj = JSON.parse(theDoc.text);
-        // plane_ts.loadData(obj);
+        const data = JSON.parse(theDoc.text);
 
-        await plane_ts.loadOperationsText(theDoc.text);
+        if(data.version == 2){
+
+            await plane_ts.loadOperationsText(data);
+        }
+        else{
+
+            plane_ts.loadData(data);
+        }
+
     }
 }
 
@@ -232,8 +239,9 @@ export async function uploadThumbnail(){
 
 export async function updateGraphDoc(){
     const text = plane_ts.getOperationsText();
-
-    await plane_ts.loadOperationsText(text);
+    
+    const data = JSON.parse(text);
+    await plane_ts.loadOperationsText(data);
 
     await firebase_ts.writeGraphDocDB(text);
 
