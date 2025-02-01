@@ -194,9 +194,11 @@ export async function playView(play_mode : PlayMode) {
         shape.show();
         View.current.shapes.push(shape);
 
+        plane_ts.addToViewShapesList(shape);
+
         shape.allShapes().forEach(x => x.show());
 
-        shape.setRelations();
+        shape.setRelations();        
 
         if(shape instanceof plane_ts.LengthEquality || shape instanceof plane_ts.AngleEquality){
             const equality = shape.verify();
@@ -208,6 +210,8 @@ export async function playView(play_mode : PlayMode) {
         if(shape.mute || shape_idx < start_shape_idx){
             continue;
         }
+
+        plane_ts.showProperty(shape, 0);
 
         let highlighted = new Set<Reading>();
 

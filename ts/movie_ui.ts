@@ -11,177 +11,133 @@ export type TextArea = layout_ts.TextArea;
 
 let isVoiceLang : boolean;
 
-export function makeEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
+export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
     const margin = 10;
     const canvas_narration_height = window.innerHeight - margin - 25 - button_size;
-    const canvas_size = Math.min(window.innerWidth, 0.5 * (canvas_narration_height));
 
-    const root = $grid({
-        id : "edit-root",
-        rows     : `25px ${canvas_narration_height}px ${button_size}px`,
-        children:[
-            $grid({
-                columns  : "50% 50%",
-                children: [
-                    plane.menu_block
-                    ,
-                    $flex({
-                        children : [
-                            // $button({
-                            //     text : "create doc",
-                            //     click : async (ev:MouseEvent)=>{
-                            //         createDoc();
-                            //     }
-                            // })
-                            // ,
-                            $button({
-                                text : "playback",
-                                click : async(ev : MouseEvent)=>{
-            
-                                    const speech = new Speech();
-                                    
-                                    await plane_ts.playBackAll(speech);
-                                }
-                            })
-                            ,            
-                            $button({
-                                text : "update doc",
-                                click : async (ev:MouseEvent)=>{
-                                    // updateDoc();
-                                    await updateGraphDoc();
-                                }
-                            })
-                            ,
-                            $button({
-                                text : "edit contents",
-                                click : async (ev:MouseEvent)=>{
-                                    await firebase_ts.showContents(undefined, undefined);
-                                }
-                            })
-                            ,
-                            $button({
-                                text : "Back up",
-                                click : async (ev:MouseEvent)=>{
-                                    if(confirm(TT("Do you want to start the backup?"))){
-
-                                        await firebase_ts.BackUp();
-                                    }
-                                }
-                            })
-                            ,
-                            $button({
-                                text : "convert",
-                                click : async (ev:MouseEvent)=>{
-                                    if(confirm(TT("Do you want to start the conversion?"))){
-
-                                        await convert();
-                                    }
-                                }
-                            })
-                            ,
-                            $button({
-                                text : "firebase",
-                                click : async (ev:MouseEvent)=>{
-                                    $dlg("firebase-menu").showModal();        
-                                }
-                            })
-                            ,
-                            $button({
-                                text : "log",
-                                click : async (ev:MouseEvent)=>{
-                                    layout_ts.Log.show(ev);
-                                }
-                            })
-                            ,
-                            $button({
-                                text : "copy all",
-                                click : async (ev:MouseEvent)=>{
-                                    await copyAll();
-                                }
-                            })
-                        ],
-                    })
-                ]
-            })
+    const edit_menu_grid = $grid({
+        columns  : "50% 50%",
+        children: [
+            plane.menu_block
             ,
-            $grid({
-                columns  : "72px 486px 40px 300px",
-
+            $flex({
                 children : [
-                    plane.tool_block
-                    ,
-                    $grid({
-                        id : "canvas-narration",
-                        rows  : "486px 378px",
-                        children : [
-                            plane.canvas_block
-                            ,
-                            plane.narration_box        
-                        ]
+                    $button({
+                        text : "playback",
+                        click : async(ev : MouseEvent)=>{
+    
+                            const speech = new Speech();
+                            
+                            await plane_ts.playBackAll(speech);
+                        }
+                    })
+                    ,            
+                    $button({
+                        text : "update doc",
+                        click : async (ev:MouseEvent)=>{
+                            // updateDoc();
+                            await updateGraphDoc();
+                        }
                     })
                     ,
-                    plane.shapes_block
+                    $button({
+                        text : "edit contents",
+                        click : async (ev:MouseEvent)=>{
+                            await firebase_ts.showContents(undefined, undefined);
+                        }
+                    })
                     ,
-                    plane.property_block
-                ]
+                    $button({
+                        text : "Back up",
+                        click : async (ev:MouseEvent)=>{
+                            if(confirm(TT("Do you want to start the backup?"))){
+
+                                await firebase_ts.BackUp();
+                            }
+                        }
+                    })
+                    ,
+                    $button({
+                        text : "convert",
+                        click : async (ev:MouseEvent)=>{
+                            if(confirm(TT("Do you want to start the conversion?"))){
+
+                                await convert();
+                            }
+                        }
+                    })
+                    ,
+                    $button({
+                        text : "firebase",
+                        click : async (ev:MouseEvent)=>{
+                            $dlg("firebase-menu").showModal();        
+                        }
+                    })
+                    ,
+                    $button({
+                        text : "log",
+                        click : async (ev:MouseEvent)=>{
+                            layout_ts.Log.show(ev);
+                        }
+                    })
+                    ,
+                    $button({
+                        text : "copy all",
+                        click : async (ev:MouseEvent)=>{
+                            await copyAll();
+                        }
+                    })
+                ],
             })
-            ,
-            play_buttons
         ]
     });
 
-    return root;    
-}
+    const main_grid = $grid({
+        columns  : "72px 486px 40px 300px",
 
-export function makePlayGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
-    let content_grid : layout_ts.Grid;
-    const horizontal = false;
-    const margin = 40;
-    const canvas_size = Math.min(window.innerWidth, 0.5 * (window.innerHeight - margin - button_size));
+        children : [
+            plane.tool_block
+            ,
+            $grid({
+                id : "canvas-narration",
+                rows  : "486px 378px",
+                children : [
+                    plane.canvas_block
+                    ,
+                    plane.narration_box        
+                ]
+            })
+            ,
+            plane.shapes_block
+            ,
+            plane.property_block
+        ]
+    });
 
-    if(horizontal){
-        content_grid = $grid({
-            children : [
-                $grid({
-                    columns  : `${canvas_size}px 100%`,
+    if(i18n_ts.appMode == AppMode.edit){
 
-                    children : [
-                        plane.narration_box
-                        ,
-                        plane.canvas_block
-                    ]        
-                })
+        return $grid({
+            rows     : `25px ${canvas_narration_height}px ${button_size}px`,
+            children:[
+                edit_menu_grid            
+                ,
+                main_grid
+                ,
+                play_buttons
             ]
-        })
+        });
     }
     else{
 
-        content_grid = $grid({
-            id : "canvas-narration",
-            columns  : `${canvas_size}px`,
-            rows  : `${canvas_size}px 100%`,
-            children : [
-                plane.canvas_block
+        return $grid({
+            rows     : `${canvas_narration_height}px ${button_size}px`,
+            children:[
+                main_grid
                 ,
-                plane.narration_box
+                play_buttons
             ]
-        })
+        });
     }
-    
-    const root = $grid({
-        width : `${canvas_size}px`,
-        rows     : `${window.innerHeight - margin - button_size}px ${button_size}px`,
-        children:[
-            $grid({
-                columns : `${window.innerWidth}px`,
-                children : [
-                    content_grid
-                ]
-            })
-            ,
-            play_buttons
-        ]
-    });
 
     return root;    
 }

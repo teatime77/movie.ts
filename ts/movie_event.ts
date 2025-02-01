@@ -139,10 +139,6 @@ export async function bodyOnLoad(){
 
 
     switch(i18n_ts.appMode){
-    case AppMode.edit:
-        root = makeEditGrid(plane, play_buttons, button_size);
-        break;
-
     case AppMode.lessonPlay:
         initLesson();
         root = makeLessonPlayGrid(button_size);
@@ -154,9 +150,10 @@ export async function bodyOnLoad(){
         root = makeLessonEditGrid(play_buttons, button_size);
         break;
 
+    case AppMode.edit:
     case AppMode.play:
     default:
-        root = makePlayGrid(plane, play_buttons, button_size);
+        root = makePlayEditGrid(plane, play_buttons, button_size);
         break;
     }
 
