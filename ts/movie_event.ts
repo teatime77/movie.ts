@@ -13,8 +13,21 @@ const $flex = layout_ts.$flex;
 const PlayMode = plane_ts.PlayMode;
 
 export const AppMode = i18n_ts.AppMode;
+export let isEdge : boolean = false;
 
 export async function bodyOnLoad(){
+    if((navigator as any).userAgentData != undefined){
+        const brands = (navigator as any).userAgentData.brands;
+        for(const brand of brands){
+            if((brand.brand as string).includes("Edge")){
+                isEdge = true;
+                msg("is Edge : true");
+            }
+            msg(`userAgentData:[${brand.brand}]`)
+        }
+    }
+    msg(`userAgent:[${navigator.userAgent}]`);
+
     [ urlOrigin, , urlParams] = i18n_ts.parseURL();
     msg(`params:${JSON.stringify(urlParams) }`);
 
@@ -159,7 +172,7 @@ export async function bodyOnLoad(){
 
     layout_ts.Layout.initLayout(root);
 
-    plane_ts.initPlane(plane, root);
+    await plane_ts.initPlane(plane, root);
     
     await includeDialog("./lib/firebase/dialog.html");
     await includeDialog("./lib/movie/dialog.html");
@@ -204,6 +217,11 @@ export async function bodyOnLoad(){
 }
 
 export async function readDoc(doc_id : number) {
+    for(const class_name of [ "tex_div", "selectable_tex" ]){
+        const tex_divs = Array.from(document.body.getElementsByClassName(class_name)) as HTMLDivElement[];
+        tex_divs.forEach(x => x.remove());    
+    }
+
     View.current.clearView();
     // msg(`id:${id}`);
     theDoc = await firebase_ts.getDoc(doc_id);
@@ -242,6 +260,11 @@ export async function updateGraphDoc(){
     
     const data = JSON.parse(text);
     await plane_ts.loadOperationsText(data);
+
+    msg(`update Graph Doc\n${text}`);
+    if(! window.confirm("update doc?")){
+        return;
+    }
 
     await firebase_ts.writeGraphDocDB(text);
 

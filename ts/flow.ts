@@ -37,6 +37,12 @@ type TriangleCongruence = plane_ts.TriangleCongruence;
 const Statement = plane_ts.Statement;
 type Statement = plane_ts.Statement;
 
+const ShapeEquation = plane_ts.ShapeEquation;
+type  ShapeEquation = plane_ts.ShapeEquation;
+
+const ExprTransform = plane_ts.ExprTransform;
+type  ExprTransform = plane_ts.ExprTransform;
+
 const TextBlock = plane_ts.TextBlock;
 type  TextBlock = plane_ts.TextBlock;
 
@@ -215,7 +221,10 @@ export async function playView(play_mode : PlayMode) {
 
         let highlighted = new Set<Reading>();
 
-        if(shape instanceof Statement){
+        if(shape instanceof plane_ts.ExprTransform){
+            await shape.speakExprTransform(speech);
+        }
+        else if(shape instanceof Statement){
             await shape.showReasonAndStatement(speech);
         }
         else if(shape instanceof Motion){
@@ -268,7 +277,41 @@ export async function playView(play_mode : PlayMode) {
         Array.from(highlighted.values()).forEach(x => x.readable.highlight(false));
         speech.callback = undefined;
 
-        if(shape instanceof TextBlock && shape.isTex || shape instanceof Statement && shape.mathText != ""){
+        if(shape instanceof ShapeEquation || shape instanceof ExprTransform){
+            const [node, text] = parser_ts.makeNodeTextByApp(shape.equation);
+
+            let text_block : TextBlock;
+            if(shape instanceof ShapeEquation){
+                text_block = shape.selectedShapes[0] as TextBlock;
+            }
+            else{
+                text_block = shape.textBlock;
+            }
+
+            const div_child = text_block.div.children[0] as HTMLElement;
+
+            /*
+                const id = setInterval(()=>{
+                    speech.prevCharIndex++;
+                    if(text.length < speech.prevCharIndex){
+                        clearInterval(id);
+                    }
+                }, 100);
+            */
+            if(isEdge){
+
+                await parser_ts.showFlow(speech, shape.equation, text_block.div, named_all_shape_map);
+            }
+            else{
+
+                div_child.style.backgroundColor = "blue";
+                await speech.speak(text);
+            }
+
+            await speech.waitEnd();                
+            div_child.style.backgroundColor = "";
+        }
+        else if(shape instanceof TextBlock && shape.isTex || shape instanceof Statement && shape.mathText != ""){
 
             await generateTex(shape, speech, named_all_shape_map);
         }
