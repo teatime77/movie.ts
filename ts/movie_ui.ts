@@ -84,7 +84,10 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
                     $button({
                         text : "copy all",
                         click : async (ev:MouseEvent)=>{
-                            await copyAll();
+                            if(window.confirm(TT("Do you want to copy all data?"))){
+
+                                await firebase_ts.copyAllGraph();
+                            }
                         }
                     })
                 ],

@@ -431,43 +431,5 @@ export async function convert(){
     msg("convert finished.")
 }
 
-export async function copyAll(){
-    const index_ref = await firebase_ts.getDocRef("index");
-    const index_data = await index_ref.get();
-    const index = index_data.data();
-    msg(`root:${JSON.stringify(index, null, 4)}`);
-
-    try{
-
-        const default_index_ref = await firebase_ts.getDocRef("index", firebase_ts.defaultRefId);
-        const default_index_data = await default_index_ref.get();
-        const default_index = default_index_data.data();
-        const children = default_index.root.children as firebase_ts.DbItem[];
-        for(const child of children){
-            if(false){
-                const doc_ref = await firebase_ts.getDocRef(`${child.id}`, firebase_ts.defaultRefId);
-                const doc_data = await doc_ref.get();
-                const doc = doc_data.data();
-
-                await firebase_ts.writeDB(`${child.id}`, doc);
-            }
-
-            index.root.children.push(child);
-
-            msg(`DB: ${child.id} ${child.name}`);
-        }
-
-    }
-    catch(e){
-        msg(`read DB error: ${e}`);
-
-        throw new MyError();        
-    }
-
-    await firebase_ts.writeDB("index", index);
-
-    msg(`root:${JSON.stringify(index, null, 4)}`);
-
-}
 
 }
