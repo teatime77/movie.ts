@@ -227,10 +227,10 @@ export async function readDoc(doc_id : number) {
     theDoc = await firebase_ts.getDoc(doc_id);
     if(theDoc != undefined){
 
-        // msg(`read doc:${theDoc.id} ${theDoc.name}`)
+        msg(`read doc:${theDoc.id} ${theDoc.name}`);
         const data = JSON.parse(theDoc.text);
 
-        if(data.version == 2){
+        if(2 <= data.version){
 
             await plane_ts.loadOperationsText(data);
         }
@@ -238,76 +238,27 @@ export async function readDoc(doc_id : number) {
 
             plane_ts.loadData(data);
         }
-
     }
-}
-
-export async function createDoc() {
-    const doc_text = plane_ts.View.getJson();
-    if(doc_text == ""){
-        return;
-    }
-
-    firebase_ts.showContents(undefined, doc_text);
-}
-
-export async function uploadThumbnail(){
-    await firebase_ts.uploadCanvasImg(View.current.canvas.canvas);
 }
 
 export async function updateGraphDoc(){
+    if(theDoc == undefined){
+        throw new MyError("doc is undefined.");
+    }
+
     const text = plane_ts.getOperationsText();
     
     const data = JSON.parse(text);
     await plane_ts.loadOperationsText(data);
 
-    msg(`update Graph Doc\n${text}`);
-    if(! window.confirm("update doc?")){
+    msg(`update Graph Doc ${theDoc.id}:${theDoc.name} \n${text}`);
+    if(! window.confirm(`update doc?\n${theDoc.id}:${theDoc.name}`)){
         return;
     }
 
-    await firebase_ts.writeGraphDocDB(text);
+    await firebase_ts.writeGraphDocDB(theDoc.id, theDoc.name, text);
 
-    await uploadThumbnail();
-}
-
-export async function updateGraphDocOld(){
-    const text = plane_ts.View.getJson();
-    if(text == ""){
-        return;
-    }
-
-    await firebase_ts.writeGraphDocDB(text);
-
-    await uploadThumbnail();
-}
-
-export async function updateDoc(){
-    const user = firebase_ts.getUser();
-    if(user == null){
-        throw new MyError();
-    }
-
-    if(theDoc == undefined){
-        alert("no document");
-        return;
-    }
-
-    const name = firebase_ts.inputDocName(theDoc.name);
-    if(name == ""){
-        return;
-    }
-
-    const json = plane_ts.View.getJson();
-    if(json == ""){
-        return;
-    }
-
-    theDoc.setName(name);
-    theDoc.text = json;
-    await theDoc.updateDocDB();
-
-    await uploadThumbnail();
+    await firebase_ts.uploadCanvasImg(theDoc.id, View.current.canvas.canvas);
 }
 
 export function SignUp(){

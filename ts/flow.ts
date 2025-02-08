@@ -408,9 +408,8 @@ export async function playAllGraph(){
 }
 
 export async function convert(){
-    const user = firebase_ts.getUser();
-    if(user == null){
-        throw new MyError();
+    if(! confirm(TT("Do you want to start the conversion?"))){
+        return;
     }
     
     for(const doc of firebase_ts.graph.docs){
@@ -419,13 +418,7 @@ export async function convert(){
             throw new MyError();
         }
 
-        theDoc.text = plane_ts.View.getJson();
-        if(theDoc.text == ""){
-            return;
-        }
-    
-        msg(`convert:${theDoc.name} [${theDoc.text}]`);
-        await theDoc.updateDocDB();
+        await updateGraphDoc();
     }
 
     msg("convert finished.")

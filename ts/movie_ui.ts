@@ -35,7 +35,6 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
                     $button({
                         text : "update doc",
                         click : async (ev:MouseEvent)=>{
-                            // updateDoc();
                             await updateGraphDoc();
                         }
                     })
@@ -53,16 +52,6 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
                             if(confirm(TT("Do you want to start the backup?"))){
 
                                 await firebase_ts.BackUp();
-                            }
-                        }
-                    })
-                    ,
-                    $button({
-                        text : "convert",
-                        click : async (ev:MouseEvent)=>{
-                            if(confirm(TT("Do you want to start the conversion?"))){
-
-                                await convert();
                             }
                         }
                     })
