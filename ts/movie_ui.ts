@@ -85,14 +85,14 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
     });
 
     const main_grid = $grid({
-        columns  : "72px 486px 40px 300px",
+        columns  : "72px 960px 40px 300px",
 
         children : [
             plane.tool_block
             ,
             $grid({
                 id : "canvas-narration",
-                rows  : "486px 378px",
+                rows  : "480px 378px",
                 children : [
                     plane.canvas_block
                     ,
