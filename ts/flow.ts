@@ -230,10 +230,6 @@ export async function playView(play_mode : PlayMode) {
         else if(shape instanceof Motion){
             await shape.animate(speech);
         }
-        else if(shape.narration != ""){
-
-            await speakAndHighlight(shape, speech, TTs(shape.narration));
-        }
         else{
 
             const root_reading = shape.reading();
