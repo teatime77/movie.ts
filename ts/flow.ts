@@ -206,13 +206,6 @@ export async function playView(play_mode : PlayMode) {
 
         shape.setRelations();        
 
-        if(shape instanceof plane_ts.LengthEquality || shape instanceof plane_ts.AngleEquality){
-            const equality = shape.verify();
-            if(equality == undefined){
-                shape.verify();
-            }
-        }
-
         if(shape.mute || shape_idx < start_shape_idx){
             continue;
         }

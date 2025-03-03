@@ -499,7 +499,7 @@ export function makeLessonEditGrid(play_buttons : Flex, button_size : number) : 
                     })
                     ,
                     $button({
-                        text : "new doc",
+                        text : "new document",
                         fontSize : "large",
                         click : newLesson
                     })

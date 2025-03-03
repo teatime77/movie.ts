@@ -155,12 +155,14 @@ export class Speech extends i18n_ts.AbstractSpeech {
             return;
         }
 
+/*        
         if(speech_id != undefined){
             const ok = await playAudio(this, speech_id);
             if(ok){
                 return;
             }
         }
+*/
 
         this.initVoice();
         msg(`Speak [${text}] ${this.voice != undefined ? this.voice.name : "no voice"}`);

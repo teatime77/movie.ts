@@ -48,6 +48,7 @@ export async function playAudio(speech : Speech, speech_id : number){
     }
 
     audio.play();
+    msg(`audio play:${speech_id}`);
 
     speech.speaking = true;
 
