@@ -64,7 +64,7 @@ export async function bodyOnLoad(){
 
     msg(`lang voice:${voiceLanguageCode} text:${text_lang} nav:${navigator.language}`);
 
-    i18n_ts.initI18n();
+    await i18n_ts.initI18n();
 
     const plane = new plane_ts.Plane();
     let root : layout_ts.Grid;
