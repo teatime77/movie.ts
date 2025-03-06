@@ -98,39 +98,6 @@ export async function speakAndHighlight(shape : MathEntity, speech : Speech, lin
     }
 }
 
-async function generateTex(shape : TextBlock | Statement, speech : Speech, named_all_shape_map : Map<string, plane_ts.Shape>) {
-    let text : string;
-    let div  : HTMLDivElement;
-
-    if(shape instanceof TextBlock){
-        text = shape.text;
-        div  = shape.div;
-    }
-    else{
-
-        text = shape.mathText;
-        if(shape.latexBox == undefined){
-            shape.latexBox = shape.makeTexUI();
-        }
-
-        div  = shape.latexBox.div;
-    }
-    try{
-
-        const term = parseMath(text);
-
-        await parser_ts.showFlow(speech, term, div, named_all_shape_map);
-
-    }
-    catch(e){
-        if(e instanceof parser_ts.SyntaxError){
-            return;
-        }
-
-        throw e;
-    }
-}
-
 export async function playLangs(){
     const langs = [
         "ara",
@@ -146,6 +113,7 @@ export async function playLangs(){
          "spa",
          "por",    
     ]
+
     for(const code3 of langs){
 
         voiceLanguageCode = code3;
@@ -155,174 +123,8 @@ export async function playLangs(){
 
         setCookie("TextLanguage", code3);
 
-        await playView(PlayMode.normal);
+        await plane_ts.playBackAll(PlayMode.normal);
     }
-}
-
-export async function playView(play_mode : PlayMode) {
-    Plane.one.playMode = play_mode;
-    stopPlayFlag = false;
-
-    View.current.restoreView();
-
-    const speech = new Speech();
-
-    let start_shape_idx = 0;
-    if(View.current.undoStack.length != 0){
-        start_shape_idx = View.current.shapes.length;
-        while(View.current.undoStack.length != 0){
-            await View.current.redo();
-        }
-    }
-
-    const all_shapes = View.current.allShapes();
-    all_shapes.forEach(x => x.hide());
-
-    const named_all_shapes = all_shapes.filter(x => x instanceof Shape && x.name != "") as Shape[];
-    const named_all_shape_map = new Map<string, plane_ts.Shape>();
-
-    named_all_shapes.forEach(x => named_all_shape_map.set(x.name, x));
-
-    const view_shapes = View.current.shapes.slice();
-
-    View.current.clearView();
-
-    // media_ts.recordAudio();
-    // await media_ts.startAudioRecorder();
-
-    for(const [shape_idx, shape] of view_shapes.entries()){
-        if(stopPlayFlag){
-            stopPlayFlag = false;
-            msg("stop play");
-            break;
-        }
-
-        shape.show();
-        View.current.shapes.push(shape);
-
-        plane_ts.addToViewShapesList(shape);
-
-        shape.allShapes().forEach(x => x.show());
-
-        shape.setRelations();        
-
-        if(shape.mute || shape_idx < start_shape_idx){
-            continue;
-        }
-
-        plane_ts.showProperty(shape, 0);
-
-        let highlighted = new Set<Reading>();
-
-        if(shape instanceof plane_ts.ExprTransform){
-            await shape.speakExprTransform(speech);
-        }
-        else if(shape instanceof Statement){
-            await shape.showReasonAndStatement(speech);
-        }
-        else if(shape instanceof Motion){
-            await shape.animate(speech);
-        }
-        else{
-
-            const root_reading = shape.reading();
-            if(root_reading.text == ""){
-
-            }
-            else if(root_reading.args.length == 0){
-
-                await speakAndHighlight(shape, speech, [root_reading.text]);
-            }
-            else{
-
-                const text = root_reading.prepareReading();
-
-                const readings = root_reading.getAllReadings();
-
-                msg(`reading:${shape.constructor.name} ${text}`);
-                msg("    " + readings.map(x => `[${x.start}->${x.end}:${x.text}]`).join(" "));
-
-                speech.callback = (idx : number)=>{
-                    for(const reading of readings){
-                        if(reading.start <= idx){
-
-                            if(!highlighted.has(reading)){
-                                msg(`hilight: start:${reading.start} ${reading.text}`);
-                                reading.readable.highlight(true);
-                                highlighted.add(reading);
-                            }
-                        }
-                    }
-                }
-
-                if(text != ""){
-                    await speech.speak(TT(text));
-                }                
-            }
-        }
-
-        await speech.waitEnd();
-
-        Array.from(highlighted.values()).forEach(x => x.readable.highlight(false));
-        speech.callback = undefined;
-
-        if(shape instanceof ShapeEquation || shape instanceof ExprTransform){
-            const [node, text] = parser_ts.makeNodeTextByApp(shape.equation);
-
-            let text_block : TextBlock;
-            if(shape instanceof ShapeEquation){
-                text_block = shape.selectedShapes[0] as TextBlock;
-            }
-            else{
-                text_block = shape.textBlock;
-            }
-
-            const div_child = text_block.div.children[0] as HTMLElement;
-
-            /*
-                const id = setInterval(()=>{
-                    speech.prevCharIndex++;
-                    if(text.length < speech.prevCharIndex){
-                        clearInterval(id);
-                    }
-                }, 100);
-            */
-            if(isEdge){
-
-                await parser_ts.showFlow(speech, shape.equation, text_block.div, named_all_shape_map);
-            }
-            else{
-
-                div_child.style.backgroundColor = "blue";
-                await speech.speak(text);
-            }
-
-            await speech.waitEnd();                
-            div_child.style.backgroundColor = "";
-        }
-        else if(shape instanceof TextBlock && shape.isTex || shape instanceof Statement && shape.mathText != ""){
-
-            await generateTex(shape, speech, named_all_shape_map);
-        }
-
-        all_shapes.forEach(x => {x.setMode(Mode.none); });
-    }
-
-    // media_ts.stopAudioRecorder();
-
-    View.current.dirty = true;
-
-    View.current.shapes = view_shapes;
-
-    View.current.restoreView();
-
-    all_shapes.forEach(x => {x.show(); x.setMode(Mode.none); });
-
-    View.current.dirty = true;
-    View.current.updateShapes();
-
-    Plane.one.playMode = PlayMode.stop;
-    playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
 }
 
 export function stopPlay(){

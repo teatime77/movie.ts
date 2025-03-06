@@ -23,16 +23,6 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
             $flex({
                 children : [
                     $button({
-                        text : "playback",
-                        click : async(ev : MouseEvent)=>{
-    
-                            const speech = new Speech();
-                            
-                            await plane_ts.playBackAll(speech);
-                        }
-                    })
-                    ,            
-                    $button({
                         text : "update doc",
                         click : async (ev:MouseEvent)=>{
                             await updateGraphDoc();
