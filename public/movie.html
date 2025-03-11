@@ -112,11 +112,8 @@ img:hover + .tooltip {
 
 .enum_selection_item {
     display: inline-block;
-    margin-left: 10px;
     cursor:pointer;
     white-space: nowrap;
-    border-width: 5px;
-    border-style: ridge;
 }
 
 .pointer {
@@ -126,10 +123,25 @@ img:hover + .tooltip {
     top : 0px;
     z-index: 10;
 }
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent background */
+}
 </style>
     
 </head>
 <body>
+<div id="modal_dlg" class="modal" tabindex="0">
+</div>
+
 <img id="pointer_img" class="pointer" src="lib/plane/img/pointer.png" />
 <img id="pointer_move_img" class="pointer" src="lib/plane/img/pointer_move.png" />
 <div id="katex-div" style="display: none; width: 1280px;; height: 670px; overflow-y: scroll;" ></div>
