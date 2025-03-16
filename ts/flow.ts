@@ -116,7 +116,7 @@ export async function playLangs(){
 
     for(const code3 of langs){
 
-        voiceLanguageCode = code3;
+        setVoiceLanguageCode(code3);
         setCookie("VoiceLanguage", code3);
         i18n_ts.setTextLanguageCode(code3)
         i18n_ts.loadTranslationMap();
@@ -137,7 +137,6 @@ export function stopPlay(){
 export async function playAllGraph(){
     firebase_ts.hideGraph();
 
-    docSpeeches = [];
     const graph = firebase_ts.getGraph();
 
     const edge_map = new Map<string, firebase_ts.Edge>();

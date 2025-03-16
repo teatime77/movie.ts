@@ -1,14 +1,6 @@
 namespace movie_ts {
 //
 
-export const $flex = layout_ts.$flex;
-export const $grid = layout_ts.$grid;
-export const $button = layout_ts.$button;
-export const $label = layout_ts.$label;
-
-export type Flex = layout_ts.Flex;
-export type TextArea = layout_ts.TextArea;
-
 let isVoiceLang : boolean;
 
 export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
@@ -134,7 +126,7 @@ export function langButtonClicked(ev:MouseEvent){
     const code3 = button.value;
     msg(`lang:${code3}`);
     if(isVoiceLang){
-        voiceLanguageCode = code3;
+        setVoiceLanguageCode(code3);
         setCookie("VoiceLanguage", code3);
     }
     else{

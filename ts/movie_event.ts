@@ -25,7 +25,7 @@ export async function bodyOnLoad(){
     let text_lang  = getCookie("TextLanguage");
 
     if(voice_lang == undefined || text_lang == undefined){
-        const code_pair = langCodeList.find(x => x[1] == navigator.language);
+        const code_pair = i18n_ts.langCodeList.find(x => x[1] == navigator.language);
         if(code_pair != undefined){
             if(voice_lang == undefined){
                 voice_lang = code_pair[0];
@@ -38,18 +38,18 @@ export async function bodyOnLoad(){
     }
 
     if(voice_lang != undefined){
-        voiceLanguageCode = voice_lang;
+        setVoiceLanguageCode(voice_lang);
     }
     if(urlParams.get("lesson") != undefined || urlParams.get("mode") == "lesson"){
 
-        voiceLanguageCode = "jpn";
+        setVoiceLanguageCode("jpn");
     }
 
     if(text_lang != undefined){
         i18n_ts.setTextLanguageCode(text_lang);
     }
 
-    msg(`lang voice:${voiceLanguageCode} text:${text_lang} nav:${navigator.language}`);
+    msg(`lang voice:${i18n_ts.voiceLanguageCode} text:${text_lang} nav:${navigator.language}`);
 
     await i18n_ts.initI18n();
 
@@ -169,7 +169,10 @@ export async function bodyOnLoad(){
     await includeDialog("./lib/movie/dialog.html");
 
     // await asyncInitSpeech();
-    initSpeech();
+    i18n_ts.initSpeech();
+    i18n_ts.isFastForward = ()=>{
+        return Plane.one.playMode == PlayMode.fastForward;
+    }
 
     await firebase_ts.initFirebase();
     firebase_ts.readDocFnc = readDoc;

@@ -1,23 +1,7 @@
+///<reference path="movie_util.ts" />
+
 namespace movie_ts {
 //
-export type  Widget = plane_ts.Widget;
-export const Widget = plane_ts.Widget;
-
-export type Img = layout_ts.Img;
-export type Grid = layout_ts.Grid;
-export type TextBox = layout_ts.TextBox;
-
-export const ImgDiv = layout_ts.ImgDiv;
-export type ImgDiv = layout_ts.ImgDiv;
-export type Attr = layout_ts.Attr;
-
-export const $img = layout_ts.$img;
-export const $textbox = layout_ts.$textbox;
-export const $imgdiv = layout_ts.$imgdiv;
-export const $textarea = layout_ts.$textarea;
-export const $input_range = layout_ts.$input_range;
-
-export const last = i18n_ts.last;
 
 let root : layout_ts.Grid;
 let thumbnails : layout_ts.Grid;

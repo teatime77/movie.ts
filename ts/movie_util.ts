@@ -1,5 +1,37 @@
 namespace movie_ts {
 //
+export const $flex = layout_ts.$flex;
+export const $grid = layout_ts.$grid;
+export const $button = layout_ts.$button;
+export const $label = layout_ts.$label;
+
+export type Flex = layout_ts.Flex;
+export type TextArea = layout_ts.TextArea;
+
+export type  Widget = plane_ts.Widget;
+export const Widget = plane_ts.Widget;
+
+export type Img = layout_ts.Img;
+export type Grid = layout_ts.Grid;
+export type TextBox = layout_ts.TextBox;
+
+export const ImgDiv = layout_ts.ImgDiv;
+export type ImgDiv = layout_ts.ImgDiv;
+export type Attr = layout_ts.Attr;
+
+export const $img = layout_ts.$img;
+export const $textbox = layout_ts.$textbox;
+export const $imgdiv = layout_ts.$imgdiv;
+export const $textarea = layout_ts.$textarea;
+export const $input_range = layout_ts.$input_range;
+
+export const last = i18n_ts.last;
+
+export type  Speech = i18n_ts.Speech;
+export const Speech = i18n_ts.Speech;
+
+export const cancelSpeech = i18n_ts.cancelSpeech;
+export const setVoiceLanguageCode = i18n_ts.setVoiceLanguageCode;
 
 const $dic = new Map<string, HTMLElement>();
 
