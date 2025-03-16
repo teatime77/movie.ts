@@ -1,6 +1,6 @@
 namespace movie_ts {
 //
-export let  docSpeeches : { docId : number, name : string, speechIds: number[]}[];
+export let  docSpeeches : { docId : number, name : string, speechIds: number[]}[] = [];
 let audio : HTMLAudioElement | undefined;
 
 function getAudioPath(lang_code: string, speech_id : number) : string {

@@ -115,7 +115,7 @@ export class Speech extends i18n_ts.AbstractSpeech {
         let charIndex = 0;
 
         const id = setInterval(()=>{
-            if(this.voice!.lang == "ja-JP"){
+            if(voiceLanguageCode == "jpn"){
                 charIndex++;
             }
             else{
