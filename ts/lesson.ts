@@ -120,7 +120,7 @@ class Slide extends Widget {
 
         const lines = this.explanation.split("\n").map(x => x.trim()).filter(x => x != "");
         for(const line of lines){
-            if(stopPlayFlag){
+            if(getPlayMode() == PlayMode.stop){
                 msg("break lines by flag");
                 break;
             }
@@ -585,7 +585,6 @@ export async function playLesson(){
     msg("play lesson start");
 
     setPlayMode(PlayMode.normal);
-    stopPlayFlag = false;
 
     speech = new Speech();
 
@@ -608,7 +607,7 @@ export async function playLesson(){
         if(idx < start_idx){
             continue;
         }
-        if(stopPlayFlag){
+        if(getPlayMode() == PlayMode.stop){
             msg("stop by flag");
             break;
         }

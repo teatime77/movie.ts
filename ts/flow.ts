@@ -56,8 +56,6 @@ namespace movie_ts {
 export const TT = i18n_ts.TT;
 export const TTs = i18n_ts.TTs;
 
-export let stopPlayFlag : boolean = false;
-
 function addTexDiv(){
     const div = document.createElement("div");
     // div.style.width = `${this.texWidth()}px`;
@@ -127,7 +125,7 @@ export function stopPlay(){
     msg("stop play");
     cancelSpeech();
     stopAudio();
-    stopPlayFlag = true;
+    setPlayMode(PlayMode.stop);
 }
 
 export async function playAllGraph(){
