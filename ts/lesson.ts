@@ -584,7 +584,7 @@ export async function readLesson(id : number) {
 export async function playLesson(){
     msg("play lesson start");
 
-    Plane.one.playMode = PlayMode.normal;
+    setPlayMode(PlayMode.normal);
     stopPlayFlag = false;
 
     speech = new Speech();
@@ -627,7 +627,7 @@ export async function playLesson(){
         }
     }
 
-    Plane.one.playMode = PlayMode.stop;
+    setPlayMode(PlayMode.stop);
     playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
     msg("play lesson completes");
 }

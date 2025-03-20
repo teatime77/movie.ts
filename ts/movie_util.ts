@@ -25,6 +25,9 @@ export const $imgdiv = layout_ts.$imgdiv;
 export const $textarea = layout_ts.$textarea;
 export const $input_range = layout_ts.$input_range;
 
+export const setPlayMode = i18n_ts.setPlayMode;
+export const getPlayMode = i18n_ts.getPlayMode;
+export const sleep = i18n_ts.sleep;
 export const last = i18n_ts.last;
 
 export type  Speech = i18n_ts.Speech;
@@ -95,15 +98,6 @@ export async function includeDialog(url : string){
     const div = document.createElement("div");
     div.innerHTML = dialog_html;
     document.body.append(div);
-}
-
-
-export async function sleep(milliseconds : number) : Promise<void> {
-    return new Promise((resolve) => {
-        setTimeout(()=>{
-            resolve();
-        }, milliseconds);
-    });
 }
 
 }

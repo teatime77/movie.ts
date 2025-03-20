@@ -77,9 +77,7 @@ export async function speakAndHighlight(shape : MathEntity, speech : Speech, lin
         
         dep.setMode(Mode.depend);
 
-        if(Plane.one.playMode == PlayMode.normal){
-            await sleep(0.5 * 1000 * shape.interval);
-        }
+        await sleep(0.5 * 1000 * shape.interval);
     }
 
 
@@ -93,9 +91,7 @@ export async function speakAndHighlight(shape : MathEntity, speech : Speech, lin
         }
     }
 
-    if(Plane.one.playMode == PlayMode.normal){
-        await sleep(1000 * shape.interval);
-    }
+    await sleep(1000 * shape.interval);
 }
 
 export async function playLangs(){
@@ -123,7 +119,7 @@ export async function playLangs(){
 
         setCookie("TextLanguage", code3);
 
-        await plane_ts.playBackAll(PlayMode.normal);
+        await plane_ts.playBack(PlayMode.normal);
     }
 }
 
@@ -143,7 +139,7 @@ export async function playAllGraph(){
 
     graph.docs.forEach(x => msg(`${x.id}:${x.title}`));
 
-    Plane.one.playMode = PlayMode.fastForward;
+    setPlayMode(PlayMode.fastForward);
     for(const doc of graph.docs){
         msg(`graph-doc ${doc.id}:${doc.title}`);
         
@@ -162,7 +158,7 @@ export async function playAllGraph(){
             }        
         }
     }
-    Plane.one.playMode = PlayMode.stop;
+    setPlayMode(PlayMode.stop);
 
     const predifned_edges : [number,number][] = [
 /*        

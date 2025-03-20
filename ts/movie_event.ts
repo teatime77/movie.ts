@@ -61,14 +61,14 @@ export async function bodyOnLoad(){
     playStopButton = $button({
         id : "play-stop-button",
         click : async (ev : MouseEvent)=>{
-            if(Plane.one.playMode == PlayMode.stop){
+            if(getPlayMode() == PlayMode.stop){
 
                 playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/pause.png`);
 
                 switch(i18n_ts.appMode){
                 case AppMode.edit:
                 case AppMode.play:
-                    await plane_ts.playBackAll(PlayMode.normal);
+                    await plane_ts.playBack(PlayMode.normal);
                     playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
                     break;
 
@@ -161,18 +161,12 @@ export async function bodyOnLoad(){
     layout_ts.Layout.initLayout(root);
 
     await plane_ts.initPlane(plane, root);
-    plane_ts.makeSpeechFnc = ()=>{
-        return new Speech();
-    }
     
     await includeDialog("./lib/firebase/dialog.html");
     await includeDialog("./lib/movie/dialog.html");
 
     // await asyncInitSpeech();
     i18n_ts.initSpeech();
-    i18n_ts.isFastForward = ()=>{
-        return Plane.one.playMode == PlayMode.fastForward;
-    }
 
     await firebase_ts.initFirebase();
     firebase_ts.readDocFnc = readDoc;
