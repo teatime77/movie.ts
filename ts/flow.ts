@@ -139,7 +139,7 @@ export async function playAllGraph(){
 
     setPlayMode(PlayMode.fastForward);
     for(const doc of graph.docs){
-        msg(`graph-doc ${doc.id}:${doc.title}`);
+        // msg(`graph-doc ${doc.id}:${doc.title}`);
         
         plane_ts.usedReasons.clear();
 
