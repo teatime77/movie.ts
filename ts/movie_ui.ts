@@ -29,16 +29,6 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
                     })
                     ,
                     $button({
-                        text : "Back up",
-                        click : async (ev:MouseEvent)=>{
-                            if(confirm(TT("Do you want to start the backup?"))){
-
-                                await firebase_ts.BackUp();
-                            }
-                        }
-                    })
-                    ,
-                    $button({
                         text : "firebase",
                         click : async (ev:MouseEvent)=>{
                             $dlg("firebase-menu").showModal();        

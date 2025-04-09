@@ -208,5 +208,46 @@ export async function convert(){
     msg("convert finished.")
 }
 
+export async function backup(){
+    if(! confirm(TT("Do you want to start the backup?"))){
+        return;
+    }
+
+    firebase_ts.hideGraph();
+
+    const graph = firebase_ts.getGraph();
+
+    const backup = new firebase_ts.BackUp();
+    for(const doc of graph.docs){
+        
+        await readDoc(doc.id);
+
+        if(theDoc == undefined){
+            throw new MyError("doc is undefined.");
+        }
+    
+        const text = plane_ts.getOperationsText();
+
+        await backup.writeBackUp(theDoc.id, theDoc.name, text);
+        
+        msg(`back-up ${doc.id}:${doc.title}`);
+    }
+
+    backup.commitBackUp();
+
+    firebase_ts.showGraph();
+}
+
+export async function playBackUp(){
+    firebase_ts.hideGraph();
+
+    for await(const doc_obj of firebase_ts.getBackUp()){
+        msg(`play backup:${doc_obj.name}`)
+        const data = JSON.parse(doc_obj.text);
+        await loadOperationsAndPlay(data);
+    }
+
+    firebase_ts.showGraph();
+}
 
 }

@@ -487,17 +487,6 @@ export function makeLessonEditGrid(play_buttons : Flex, button_size : number) : 
                         fontSize : "large",
                         click : newLesson
                     })
-                    ,
-                    $button({
-                        text : "Back up",
-                        fontSize : "large",
-                        click : async (ev:MouseEvent)=>{
-                            if(confirm(TT("Do you want to start the backup?"))){
-
-                                await firebase_ts.BackUp();
-                            }
-                        }
-                    })
                 ]
             })
             ,

@@ -204,10 +204,23 @@ export async function bodyOnLoad(){
     }
 }
 
+export async function loadOperationsAndPlay(data : any) {
+    const view = View.current;
+
+    let operations = await plane_ts.loadOperationsText(data);
+
+    const num_operations = operations.length;
+    operations.forEach(x => view.addOperation(x));
+
+    await plane_ts.playBack(PlayMode.fastForward);
+    assert(num_operations == view.operations.length);
+}
+
 export async function readDoc(doc_id : number) {
     plane_ts.removeDiv();
 
-    View.current.clearView();
+    const view = View.current;
+    view.clearView();
     // msg(`id:${id}`);
     theDoc = await firebase_ts.getDoc(doc_id);
     if(theDoc != undefined){
@@ -217,7 +230,7 @@ export async function readDoc(doc_id : number) {
 
         if(2 <= data.version){
 
-            await plane_ts.loadOperationsText(data);
+            await loadOperationsAndPlay(data);
         }
         else{
 
@@ -234,7 +247,7 @@ export async function updateGraphDoc(){
     const text = plane_ts.getOperationsText();
     
     const data = JSON.parse(text);
-    await plane_ts.loadOperationsText(data);
+    await loadOperationsAndPlay(data);
 
     msg(`update Graph Doc ${theDoc.id}:${theDoc.name} \n${text}`);
     if(! window.confirm(`update doc?\n${theDoc.id}:${theDoc.name}`)){
