@@ -204,6 +204,26 @@ export async function bodyOnLoad(){
     }
 }
 
+async function undo_redo_test(){
+    const view = View.current;
+
+    for(let cnt = 1;;cnt++){
+        for(const _ of range(cnt)){
+            await view.undo();
+            await sleep(10);
+        }
+        const stop = (view.shapes.length == 0);
+        for(const _ of range(cnt)){
+            await view.redo();
+            await sleep(10);
+        }
+
+        if(stop){
+            break;
+        }
+    }
+}
+
 export async function loadOperationsAndPlay(data : any) {
     const view = View.current;
 
@@ -214,6 +234,8 @@ export async function loadOperationsAndPlay(data : any) {
 
     await plane_ts.playBack(PlayMode.fastForward);
     assert(num_operations == view.operations.length);
+
+    await undo_redo_test();
 }
 
 export async function readDoc(doc_id : number) {
