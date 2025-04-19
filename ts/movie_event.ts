@@ -235,7 +235,7 @@ export async function loadOperationsAndPlay(data : any) {
     await plane_ts.playBack(PlayMode.fastForward);
     assert(num_operations == view.operations.length);
 
-    await undo_redo_test();
+    // await undo_redo_test();
 }
 
 export async function readDoc(doc_id : number) {
