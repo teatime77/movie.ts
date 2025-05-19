@@ -21,7 +21,7 @@ lang_list : list[tuple[str, str]] = [
     ("hin", "hi-IN", "AnanyaNeural"),
     ("ind", "id-ID", "GadisNeural"),
     ("jpn", "ja-JP", "AoiNeural"), # NanamiNeural AoiNeural MayuNeural ShioriNeural
-    ("kor", "ko-KR", "SunHiNeural"),
+    ("kor", "ko-KR", "SunHiNeural"), # SunHiNeural JiMinNeural SeoHyeonNeural SoonBokNeural YuJinNeural
     ("rus", "ru-RU", "SvetlanaNeural"),
     ("spa", "es-ES", "ElviraNeural"),
     ("por", "pt-PT", "RaquelNeural")
@@ -48,9 +48,7 @@ lang_dict = dict(lang_list2)
 
 voice_dict = dict( [x[1:] for x in lang_list] )
 
-def text_to_speech(num_text : list[tuple[int, str]], code3, voice_name):
-    target_dir = f'../../firebase.ts/public/lib/i18n/audio/{code3}'
-
+def make_speech_config(voice_name : str):
     # Initialize the speech configuration
     speech_config = speechsdk.SpeechConfig(subscription=subscription_key, region=region)
 
@@ -58,29 +56,47 @@ def text_to_speech(num_text : list[tuple[int, str]], code3, voice_name):
     speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3)
     # speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
+    return speech_config
+
+def make_audo_file(speech_config, text, output_filename):
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=output_filename)
+
+    # Initialize the synthesizer
+    synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+
+    # Synthesize the text to speech
+    result = synthesizer.speak_text_async(text).get()
+
+    # Check the result
+    if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+        print(text)
+    elif result.reason == speechsdk.ResultReason.Canceled:
+        cancellation_details = result.cancellation_details
+        print(f"Speech synthesis canceled: {cancellation_details.reason}")
+        if cancellation_details.reason == speechsdk.CancellationReason.Error:
+            if cancellation_details.error_details:
+                print(f"Error details: {cancellation_details.error_details}")
+        print("Did you set the speech resource key and region values correctly?")
+
+
+def text_to_speech(target_dir : str, num_text : list[tuple[int, str]], voice_name : str):
+    speech_config = make_speech_config(voice_name)
 
     for num, text in num_text:
         output_filename = f'{target_dir}/{num}.mp3'
+        make_audo_file(speech_config, text, output_filename)
 
-        audio_config = speechsdk.audio.AudioOutputConfig(filename=output_filename)
 
-        # Initialize the synthesizer
-        synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+def get_short_name(lang_code : str, voice_name : str):
+    k1 = voice_name.find(lang_code)
+    if k1 == -1:
+        return None
+    else:
+        k1 += 6
+        k2 = str(voice_name).find(")", k1)
+        name = str(voice_name)[k1:k2].strip()
 
-        # Synthesize the text to speech
-        result = synthesizer.speak_text_async(text).get()
-
-        # Check the result
-        if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-            print(num, text)
-        elif result.reason == speechsdk.ResultReason.Canceled:
-            cancellation_details = result.cancellation_details
-            print(f"Speech synthesis canceled: {cancellation_details.reason}")
-            if cancellation_details.reason == speechsdk.CancellationReason.Error:
-                if cancellation_details.error_details:
-                    print(f"Error details: {cancellation_details.error_details}")
-            print("Did you set the speech resource key and region values correctly?")
-
+        return name
 
 def list_voices(lang_code : str):
     # Initialize the speech configuration
@@ -95,26 +111,28 @@ def list_voices(lang_code : str):
     short_voice_name = voice_dict[lang_code]
 
     voice_name = None
+    voice_name_list = []
     if voices_result.reason == speechsdk.ResultReason.VoicesListRetrieved:
         voices = voices_result.voices
         for voice in voices:
             if voice.locale == lang_code and voice.gender == speechsdk.SynthesisVoiceGender.Female:
-                k1 = voice.name.find(lang_code)
-                if k1 == -1:
-                    print(f"Name: {voice.name}, Locale: {voice.locale}, Gender: {voice.gender}, Voice Path: {voice.voice_path}")
-                else:
-                    k1 += 6
-                    k2 = str(voice.name).find(")", k1)
-                    name = str(voice.name)[k1:k2].strip()
-                    print(f"{name}")
 
-                    if short_voice_name == name:
-                        voice_name = voice.name
+                    name = get_short_name(lang_code, voice.name)
+                    if name is None:
+                        print(f"Name: {voice_name}, Locale: {voice.locale}, Gender: {voice.gender}, Voice Path: {voice.voice_path}")
+                    else:
+                        print(f"{name}[{voice.name}]")
+
+                        voice_name_list.append(voice.name)
+
+                        if short_voice_name == name:
+                            voice_name = voice.name
     else:
         print(f"Failed to retrieve voices. Error details: {voices_result.error_details}")
 
+    print()
     print(f"select the voice. [{short_voice_name}] => [{voice_name}]")
-    return voice_name
+    return [voice_name, voice_name_list]
 
 
 def make_audio_files(mode, code3, voice_name):
@@ -157,22 +175,43 @@ def make_audio_files(mode, code3, voice_name):
         return
     
     print("\nnum_text=", num_text)
-    text_to_speech(num_text, code3, voice_name)
+    target_dir = f'../../firebase.ts/public/lib/i18n/audio/{code3}'
+    text_to_speech(target_dir, num_text, voice_name)
 
+def test_speech(lang_code, voice_name_list):
+    texts = [
+        "“생명, 감사합니다” 어린이부터 노인까지, 전세계의 모든 사람들이 생명을 존중하고 생명에 대한 감사로 감싸인 그런 세계를 만들고 싶다."
+    ]
+
+    for voice_name in voice_name_list:
+        k = voice_name.find("[")
+        short_name = get_short_name(lang_code, voice_name)
+        print(f"short:[{short_name}][{voice_name}]")
+
+        speech_config = make_speech_config(voice_name)
+        for i, text in enumerate(texts):
+            output_filename = f"./audio/{i+1}-{short_name}.mp3"
+            print(output_filename)
+            make_audo_file(speech_config, text, output_filename)
 
 if __name__ == '__main__':
     args = sys.argv
     print(len(args), args[0], args[1])
-    if len(args) == 3:
+    if 2 <= len(args):
 
         code3      = args[1]
-        mode       = int(args[2])
         lang_code  = lang_dict[code3]
         short_voice_name = voice_dict[lang_code]
 
-        voice_name = list_voices(lang_code)
+        [voice_name, voice_name_list] = list_voices(lang_code)
         print(code3, lang_code, short_voice_name, voice_name)
 
-        if voice_name is not None and 0 < mode:
-            make_audio_files(mode, code3, voice_name)
+        if len(args) == 3:
+            mode       = int(args[2])
+
+            if mode == 0:
+                test_speech(lang_code, voice_name_list)
+
+            elif voice_name is not None and 0 < mode:
+                make_audio_files(mode, code3, voice_name)
 
