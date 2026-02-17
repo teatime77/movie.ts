@@ -1,9 +1,12 @@
-namespace movie_ts {
-//
+import { $dlg, TT, AppMode, msg, appMode, setTextLanguageCode, loadTranslationMap, setVoiceLanguageCode } from "@i18n";
+import { Flex, $grid, $flex, $button, Grid, Log } from "@layout";
+import { updateGraphDoc, root } from "./movie_event";
+import { Plane } from "@plane";
+import { copyAllGraph, showContents } from "@firebase";
 
 let isVoiceLang : boolean;
 
-export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, button_size : number) : layout_ts.Grid {
+export function makePlayEditGrid(plane : Plane, play_buttons : Flex, button_size : number) : Grid {
     const margin = 10;
     const canvas_narration_height = window.innerHeight - margin - 25 - button_size;
 
@@ -24,7 +27,7 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
                     $button({
                         text : "edit contents",
                         click : async (ev:MouseEvent)=>{
-                            await firebase_ts.showContents(undefined, undefined);
+                            await showContents(undefined, undefined);
                         }
                     })
                     ,
@@ -38,7 +41,7 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
                     $button({
                         text : "log",
                         click : async (ev:MouseEvent)=>{
-                            layout_ts.Log.show(ev);
+                            Log.show(ev);
                         }
                     })
                     ,
@@ -47,7 +50,7 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
                         click : async (ev:MouseEvent)=>{
                             if(window.confirm(TT("Do you want to copy all data?"))){
 
-                                await firebase_ts.copyAllGraph();
+                                await copyAllGraph();
                             }
                         }
                     })
@@ -78,7 +81,7 @@ export function makePlayEditGrid(plane : plane_ts.Plane, play_buttons : Flex, bu
         ]
     });
 
-    if(i18n_ts.appMode == AppMode.edit){
+    if(appMode == AppMode.edit){
 
         return $grid({
             rows     : `25px ${canvas_narration_height}px ${button_size}px`,
@@ -120,8 +123,8 @@ export function langButtonClicked(ev:MouseEvent){
         setCookie("VoiceLanguage", code3);
     }
     else{
-        i18n_ts.setTextLanguageCode(code3)
-        i18n_ts.loadTranslationMap();
+        setTextLanguageCode(code3)
+        loadTranslationMap();
 
         setCookie("TextLanguage", code3);
     }
@@ -152,7 +155,4 @@ export function getCookie(name : string) : string | undefined {
     }
 
     return undefined;
-}
-
-
 }

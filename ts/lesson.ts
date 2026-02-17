@@ -1,21 +1,24 @@
 ///<reference path="movie_util.ts" />
 
-namespace movie_ts {
-//
+import { Speech, assert, AppMode, getPlayMode, PlayMode, msg, TT, MyError, $div, setPlayMode, appMode, $dlg, cancelSpeech } from "@i18n";
+import { $img, $textbox, $input_range, $textarea, ImgDiv, Img, TextBox, $grid, Flex, $label, $flex, $button, Grid, UI, $imgdiv } from "@layout";
+import { parseObject, Widget } from "@plane";
+import { urlOrigin, urlBase, theDoc, playStopButton, urlParams, setDoc } from "./movie_event";
+import { getMyDoc, getRootFolder, getStorageDownloadURL, showContents, uploadImgFile } from "@firebase";
 
-let root : layout_ts.Grid;
-let thumbnails : layout_ts.Grid;
-let thumbnails_content : layout_ts.Grid;
-let slide_ui : layout_ts.Grid;
-let quiz_ui : layout_ts.Grid;
+let root : Grid;
+let thumbnails : Grid;
+let thumbnails_content : Grid;
+let slide_ui : Grid;
+let quiz_ui : Grid;
 let theLesson : Lesson;
 let current : Slide | Quiz | undefined;
 let speech : Speech;
 
-let slide_play_ui : layout_ts.Grid;
+let slide_play_ui : Grid;
 
 async function sliderChanged(ev : Event){
-    assert(i18n_ts.appMode == AppMode.lessonPlay);
+    assert(appMode == AppMode.lessonPlay);
 
     const idx = Slide.ui.input_range.getValue();
     assert(idx == Math.floor(idx));
@@ -79,7 +82,7 @@ class Slide extends Widget {
         let url = this.imgPath;
         if(url.startsWith("users/")){
             
-            url = await firebase_ts.getStorageDownloadURL(url);
+            url = await getStorageDownloadURL(url);
         }
 
         return url;
@@ -88,7 +91,7 @@ class Slide extends Widget {
     async addThumbnail(file? : File){
         this.downloadURL = await this.getDownloadURL();
 
-        const img = layout_ts.$img({
+        const img = $img({
             imgUrl : this.downloadURL,
             file   : file,
             width : "100px",
@@ -178,7 +181,7 @@ class Quiz extends Widget {
     }
 
     async addThumbnail(){
-        const img = layout_ts.$img({
+        const img = $img({
             imgUrl : `${urlOrigin}/lib/movie/img/quiz.png`,
             width : "100px",
             height : "100px",
@@ -271,7 +274,7 @@ function updateDataByUI(){
     }
 }
 
-function setEditUI(ui : layout_ts.UI){
+function setEditUI(ui : UI){
     assert(thumbnails_content.children.length == 2);
 
     thumbnails_content.popChild();
@@ -332,7 +335,7 @@ async function newLesson() {
     const data = theLesson.makeObj();
     const doc_text = JSON.stringify(data, null, 4);
 
-    firebase_ts.showContents(undefined, doc_text);
+    showContents(undefined, doc_text);
 }
 
 async function updateLesson() {
@@ -349,7 +352,7 @@ async function updateLesson() {
 }
 
 async function onFileDrop(file : File){
-    const path = await firebase_ts.uploadImgFile(file);
+    const path = await uploadImgFile(file);
 
     if(current instanceof Slide){
         current.imgPath = path;
@@ -365,7 +368,7 @@ async function onFileDrop(file : File){
 }
 
 
-export function makeLessonPlayGrid(button_size : number) : layout_ts.Grid {
+export function makeLessonPlayGrid(button_size : number) : Grid {
 
     root = $grid({
         rows : `70% 30% ${button_size}px`,
@@ -389,7 +392,7 @@ export function makeLessonPlayGrid(button_size : number) : layout_ts.Grid {
 }
 
 
-export function makeLessonEditGrid(play_buttons : Flex, button_size : number) : layout_ts.Grid {
+export function makeLessonEditGrid(play_buttons : Flex, button_size : number) : Grid {
     slide_play_ui = $grid({
         rows : "70% 30%",
         children : [
@@ -518,13 +521,15 @@ function parseLessonObject(obj : any) : any {
 
 export async function readLesson(id : number) {
     // msg(`id:${id}`);
-    theDoc = await firebase_ts.getDoc(id);
+    const doc = await getMyDoc(id);
+    setDoc(doc)
+
     if(theDoc != undefined){
 
         // msg(`read doc:${theDoc.id} ${theDoc.name}`)
         const obj = JSON.parse(theDoc.text);
 
-        const lesson = plane_ts.parseObject(obj, parseLessonObject);
+        const lesson = parseObject(obj, parseLessonObject);
         if(lesson instanceof Lesson){
 
             msg("lesson loaded");
@@ -541,7 +546,7 @@ export async function readLesson(id : number) {
                 const progress = 100 * idx / theLesson.materials.length;
                 $div("progress-bar-fill").style.width = `${progress}%`;
 
-                if(i18n_ts.appMode == AppMode.lessonEdit){
+                if(appMode == AppMode.lessonEdit){
                     await material.addThumbnail();
                 }
                 else{
@@ -578,7 +583,7 @@ export async function playLesson(){
     speech = new Speech();
 
     let start_idx = 0;
-    if(i18n_ts.appMode == AppMode.lessonEdit){
+    if(appMode == AppMode.lessonEdit){
 
         if(current != undefined){
             start_idx = theLesson.materials.indexOf(current);
@@ -604,7 +609,7 @@ export async function playLesson(){
 
         if(material instanceof Slide){
 
-            if(i18n_ts.appMode == AppMode.lessonEdit){
+            if(appMode == AppMode.lessonEdit){
                 setEditUI(slide_play_ui);
             }
 
@@ -616,7 +621,7 @@ export async function playLesson(){
     }
 
     setPlayMode(PlayMode.stop);
-    playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
+    playStopButton.setImgUrl(`${urlBase}/lib/plane/img/play.png`);
     msg("play lesson completes");
 }
 
@@ -625,7 +630,7 @@ export async function stopLesson(){
 }
 
 export async function initLessonPlay(){
-    const root_folder = await firebase_ts.getRootFolder();
+    const root_folder = await getRootFolder();
     let doc_id : number;
 
     const lessonId = urlParams.get("lesson");
@@ -642,5 +647,4 @@ export function initLesson(){
     theLesson = new Lesson({
         materials : []
     });
-}
 }

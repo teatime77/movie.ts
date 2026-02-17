@@ -1,31 +1,35 @@
-namespace movie_ts {
-//
+import { DbDoc, getMyDoc, getRootFolder, initFirebase, initForMovie, makeDocsGraph, refId, uploadCanvasImg, writeGraphDocDB } from "@firebase";
+import { msg, getPlayMode, PlayMode, MyError, range, sleep, assert, parseURL, langCodeList, setTextLanguageCode, voiceLanguageCode, initI18n, appMode, AppMode, initSpeech, $dlg, setVoiceLanguageCode } from "@i18n";
+import { $button, $flex, bgColor, Button, fgColor, getPhysicalSize, Grid, Layout } from "@layout";
+import { stopPlay } from "./flow";
+import { playLesson, initLesson, makeLessonPlayGrid, makeLessonEditGrid, initLessonPlay } from "./lesson";
+import { getCookie, showLangDlg, makePlayEditGrid, langButtonClicked } from "./movie_ui";
+import { includeDialog } from "./movie_util";
+import { getOperationsText, GlobalState, initPlane, initRelations, loadData, loadOperationsText, Plane, playBack, removeDiv } from "@plane";
 
-export let theDoc : firebase_ts.DbDoc | undefined;
-export let root : layout_ts.Grid;
+export let theDoc : DbDoc | undefined;
+export let root : Grid;
 export let urlOrigin : string;
 export let urlParams : Map<string, string>;
-export let playStopButton : layout_ts.Button;
+export let urlBase : string;
+export let playStopButton : Button;
 
-const $button = layout_ts.$button;
-const $flex = layout_ts.$flex;
-
-const PlayMode = plane_ts.PlayMode;
-
-export const AppMode = i18n_ts.AppMode;
+export function setDoc(doc : DbDoc | undefined){
+    theDoc = doc;
+}
 
 export async function bodyOnLoad(){
-    [ urlOrigin, , urlParams] = i18n_ts.parseURL();
+    [ urlOrigin, , urlParams, urlBase ] = parseURL();
     msg(`params:${JSON.stringify(urlParams) }`);
 
-    document.body.style.color = layout_ts.fgColor;
-    document.body.style.backgroundColor = layout_ts.bgColor;
+    document.body.style.color = fgColor;
+    document.body.style.backgroundColor = bgColor;
 
     let voice_lang = getCookie("VoiceLanguage");
     let text_lang  = getCookie("TextLanguage");
 
     if(voice_lang == undefined || text_lang == undefined){
-        const code_pair = i18n_ts.langCodeList.find(x => x[1] == navigator.language);
+        const code_pair = langCodeList.find(x => x[1] == navigator.language);
         if(code_pair != undefined){
             if(voice_lang == undefined){
                 voice_lang = code_pair[0];
@@ -46,15 +50,15 @@ export async function bodyOnLoad(){
     }
 
     if(text_lang != undefined){
-        i18n_ts.setTextLanguageCode(text_lang);
+        setTextLanguageCode(text_lang);
     }
 
-    msg(`lang voice:${i18n_ts.voiceLanguageCode} text:${text_lang} nav:${navigator.language}`);
+    msg(`lang voice:${voiceLanguageCode} text:${text_lang} nav:${navigator.language}`);
 
-    await i18n_ts.initI18n();
+    await initI18n();
 
-    const plane = new plane_ts.Plane();
-    let root : layout_ts.Grid;
+    const plane = new Plane();
+    let root : Grid;
 
     const button_size = window.innerHeight / 16;
 
@@ -63,13 +67,13 @@ export async function bodyOnLoad(){
         click : async (ev : MouseEvent)=>{
             if(getPlayMode() == PlayMode.stop){
 
-                playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/pause.png`);
+                playStopButton.setImgUrl(`${urlBase}/lib/plane/img/pause.png`);
 
-                switch(i18n_ts.appMode){
+                switch(appMode){
                 case AppMode.edit:
                 case AppMode.play:
-                    await plane_ts.playBack(PlayMode.normal);
-                    playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
+                    await playBack(PlayMode.normal);
+                    playStopButton.setImgUrl(`${urlBase}/lib/plane/img/play.png`);
                     break;
 
                 case AppMode.lessonPlay:
@@ -82,7 +86,7 @@ export async function bodyOnLoad(){
                 }
             }
             else{
-                switch(i18n_ts.appMode){
+                switch(appMode){
                 case AppMode.edit:
                 case AppMode.play:
                     stopPlay();
@@ -98,10 +102,10 @@ export async function bodyOnLoad(){
                     throw new MyError();
                 }
 
-                playStopButton.setImgUrl(`${urlOrigin}/lib/plane/img/play.png`);
+                playStopButton.setImgUrl(`${urlBase}/lib/plane/img/play.png`);
             }
         },
-        url    : `${urlOrigin}/lib/plane/img/play.png`,
+        url    : `${urlBase}/lib/plane/img/play.png`,
         // position : "static",
         margin : "auto 5px",
         width  : `${button_size}px`,
@@ -116,7 +120,7 @@ export async function bodyOnLoad(){
                 click : async (ev : MouseEvent)=>{
                     showLangDlg(true);
                 },
-                url    : `${urlOrigin}/lib/plane/img/volume.png`,
+                url    : `${urlBase}/lib/plane/img/volume.png`,
                 margin : "auto 5px",
                 width  : `${button_size}px`,
                 height : `${button_size}px`,
@@ -126,7 +130,7 @@ export async function bodyOnLoad(){
                 click : async (ev : MouseEvent)=>{
                     showLangDlg(false);
                 },
-                url    : `${urlOrigin}/lib/plane/img/subtitle.png`,
+                url    : `${urlBase}/lib/plane/img/subtitle.png`,
                 margin : "auto 5px",
                 width  : `${button_size}px`,
                 height : `${button_size}px`,
@@ -139,7 +143,7 @@ export async function bodyOnLoad(){
     play_buttons.div.style.justifyContent = "center";
 
 
-    switch(i18n_ts.appMode){
+    switch(appMode){
     case AppMode.lessonPlay:
         initLesson();
         root = makeLessonPlayGrid(button_size);
@@ -158,34 +162,30 @@ export async function bodyOnLoad(){
         break;
     }
 
-    layout_ts.Layout.initLayout(root);
+    Layout.initLayout(root);
 
-    await plane_ts.initPlane(plane, root);
+    await initPlane(plane, root);
     
-    await includeDialog("./lib/firebase/dialog.html");
-    await includeDialog("./lib/movie/dialog.html");
+    await includeDialog(`${urlBase}/lib/firebase/dialog.html`);
+    await includeDialog(`${urlBase}/lib/movie/dialog.html`);
 
     // await asyncInitSpeech();
-    i18n_ts.initSpeech();
+    initSpeech();
 
-    await firebase_ts.initFirebase();
-    firebase_ts.readDocFnc = readDoc;
+    await initFirebase();
 
-    if(i18n_ts.appMode == AppMode.lessonPlay){
-        firebase_ts.refId = "wutfxujVE0GGD5YW";
-        msg(`set ref-ID:[${firebase_ts.refId}]`);
-    }
+    initForMovie(readDoc);
 
-    const size = layout_ts.getPhysicalSize();
+    const size = getPhysicalSize();
     msg(`size:${size.width_cm.toFixed(1)} ${size.height_cm.toFixed(1)}`);
     msg(`navigator:${navigator.appVersion}`);
 
-    plane_ts.initRelations();
+    initRelations();
 
     const doc_id = urlParams.get("id");
     if(doc_id != undefined){
 
-        const root_folder = await firebase_ts.getRootFolder();
+        await getRootFolder();
 
         await readDoc(parseInt(doc_id));
     }
@@ -195,17 +195,17 @@ export async function bodyOnLoad(){
         button.addEventListener("click", langButtonClicked);
     }
 
-    if(i18n_ts.appMode == AppMode.lessonPlay){
+    if(appMode == AppMode.lessonPlay){
         await initLessonPlay();
     }
-    else if(i18n_ts.appMode != AppMode.lessonEdit){
+    else if(appMode != AppMode.lessonEdit){
 
-        await firebase_ts.makeDocsGraph();
+        await makeDocsGraph();
     }
 }
 
 async function undo_redo_test(){
-    const view = View.current;
+    const view = GlobalState.View__current!;
 
     for(let cnt = 1;;cnt++){
         for(const _ of range(cnt)){
@@ -225,26 +225,26 @@ async function undo_redo_test(){
 }
 
 export async function loadOperationsAndPlay(data : any) {
-    const view = View.current;
+    const view = GlobalState.View__current!;
 
-    let operations = await plane_ts.loadOperationsText(data);
+    let operations = await loadOperationsText(data);
 
     const num_operations = operations.length;
     operations.forEach(x => view.addOperation(x));
 
-    await plane_ts.playBack(PlayMode.fastForward);
+    await playBack(PlayMode.fastForward);
     assert(num_operations == view.operations.length);
 
     // await undo_redo_test();
 }
 
 export async function readDoc(doc_id : number) {
-    plane_ts.removeDiv();
+    removeDiv();
 
-    const view = View.current;
+    const view = GlobalState.View__current!;
     view.clearView();
     // msg(`id:${id}`);
-    theDoc = await firebase_ts.getDoc(doc_id);
+    theDoc = await getMyDoc(doc_id);
     if(theDoc != undefined){
 
         msg(`read doc:${theDoc.id} ${theDoc.name}`);
@@ -256,7 +256,7 @@ export async function readDoc(doc_id : number) {
         }
         else{
 
-            plane_ts.loadData(data);
+            loadData(data);
         }
     }
 }
@@ -266,7 +266,7 @@ export async function updateGraphDoc(){
         throw new MyError("doc is undefined.");
     }
 
-    const text = plane_ts.getOperationsText();
+    const text = getOperationsText();
     
     const data = JSON.parse(text);
     await loadOperationsAndPlay(data);
@@ -276,13 +276,13 @@ export async function updateGraphDoc(){
         return;
     }
 
-    await firebase_ts.writeGraphDocDB(theDoc.id, theDoc.name, text);
+    await writeGraphDocDB(theDoc.id, theDoc.name, text);
 
-    await firebase_ts.uploadCanvasImg(theDoc.id, View.current.canvas.canvas);
+    await uploadCanvasImg(theDoc.id, GlobalState.View__current!.canvas);
 }
 
 export function SignUp(){
     $dlg("sign-up").showModal();
 }
 
-}
+document.addEventListener('DOMContentLoaded', bodyOnLoad );

@@ -12,45 +12,22 @@
 
 <!------------------------------------ firebase start -------------------------------------->
     <!-- update the version number as needed -->
-    <script defer src="/__/firebase/10.13.2/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/firebase/10.14.1/firebase-app-compat.js"></script>
     <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/10.13.2/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/10.13.2/firebase-analytics-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/firebase/10.14.1/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/firebase/10.14.1/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/firebase/10.14.1/firebase-storage-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/firebase/10.14.1/firebase-analytics-compat.js"></script>
     <!-- 
       initialize the SDK after all desired features are loaded, set useEmulator to false
       to avoid connecting the SDK to running emulators.
     -->
-    <script defer src="/__/firebase/init.js?useEmulator=false"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/firebase/init.js?useEmulator=false"></script>
 <!------------------------------------ firebase end   -------------------------------------->
 
-<!------------------------------------ katex start   -------------------------------------->
-    <link rel="stylesheet" href="../katex/katex.min.css"
-    integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+<script type="text/javascript" src="viz-standalone.js"></script>
 
-    <!-- The loading of KaTeX is deferred to speed up page rendering -->
-    <script defer src="../katex/katex.min.js"
-    integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx"
-    crossorigin="anonymous"></script>
-
-    <!-- To automatically render math in text elements, include the auto-render extension: -->
-    <script defer src="../katex/contrib/auto-render.min.js"
-    integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
-<!------------------------------------ katex end   -------------------------------------->
-
-<script type="text/javascript" src="lib/firebase/viz-standalone.js"></script>
-
-
-<script type="text/javascript" src="lib/i18n/i18n.js?ver=1"></script>
-<script type="text/javascript" src="lib/layout/layout.js?ver=1"></script>
-<script type="text/javascript" src="lib/parser/parser.js?ver=1"></script>
-<script type="text/javascript" src="lib/algebra/algebra.js?ver=1"></script>
-<script type="text/javascript" src="lib/plane/plane.js?ver=1"></script>
-<script type="text/javascript" src="lib/firebase/firebase.js?ver=1"></script>
-<script type="text/javascript" src="lib/media/media.js?ver=1"></script>
-<script type="text/javascript" src="lib/movie/movie.js?ver=1"></script>
+<script type="module" src="lib/movie/index.mjs"></script>
 
 
 <style type="text/css">
@@ -145,10 +122,6 @@ img:hover + .tooltip {
 <img id="pointer_img" class="pointer" src="lib/plane/img/pointer.png" />
 <img id="pointer_move_img" class="pointer" src="lib/plane/img/pointer_move.png" />
 <div id="katex-div" style="display: none; width: 1280px;; height: 670px; overflow-y: scroll;" ></div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', movie_ts.bodyOnLoad );
-</script>
 
 <dialog id="lang-texts-dlg">
 <textarea id="lang-texts-text" rows="50" cols="180" ></textarea>    

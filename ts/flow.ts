@@ -1,60 +1,9 @@
-type  DbDoc = firebase_ts.DbDoc;
-const DbDoc = firebase_ts.DbDoc;
-
-type Term = parser_ts.Term;
-const Term = parser_ts.Term;
-
-type App = parser_ts.App;
-const App = parser_ts.App;
-
-type ConstNum = parser_ts.ConstNum;
-const ConstNum = parser_ts.ConstNum;
-
-type RefVar = parser_ts.RefVar;
-const RefVar = parser_ts.RefVar;
-
-const isGreek = parser_ts.isGreek;
-const texName = parser_ts.texName;
-
-const isLetterOrAt = parser_ts.isLetterOrAt;
-
-const parseMath = parser_ts.parseMath;
-
-const Plane = plane_ts.Plane;
-const View = plane_ts.View;
-
-type Shape = plane_ts.Shape;
-const Shape = plane_ts.Shape;
-
-type Motion = plane_ts.Motion;
-const Motion = plane_ts.Motion;
-
-type MathEntity = plane_ts.MathEntity;
-
-const TriangleCongruence = plane_ts.TriangleCongruence;
-type TriangleCongruence = plane_ts.TriangleCongruence;
-
-const Statement = plane_ts.Statement;
-type Statement = plane_ts.Statement;
-
-const ShapeEquation = plane_ts.ShapeEquation;
-type  ShapeEquation = plane_ts.ShapeEquation;
-
-const ExprTransform = plane_ts.ExprTransform;
-type  ExprTransform = plane_ts.ExprTransform;
-
-const TextBlock = plane_ts.TextBlock;
-type  TextBlock = plane_ts.TextBlock;
-
-const PlayMode = plane_ts.PlayMode;
-type  PlayMode = plane_ts.PlayMode;
-
-const Mode = plane_ts.Mode;
-
-namespace movie_ts {
-//
-export const TT = i18n_ts.TT;
-export const TTs = i18n_ts.TTs;
+import { $, $div, $dlg, assert, cancelSpeech, getEngTexts, loadTranslationMap, msg, MyError, PlayMode, setPlayMode, setTextLanguageCode, setVoiceLanguageCode, sleep, Speech, TT } from "@i18n";
+import { getOperationsText, MathEntity, playBack, reasonToDoc, ShapeMode, Statement, usedReasons } from "@plane"
+import { BackUp, Edge, getBackUp, getGraph, graph, hideGraph, showGraph } from "@firebase"
+import { readDoc, theDoc, updateGraphDoc, loadOperationsAndPlay } from "./movie_event";
+import { setCookie } from "./movie_ui";
+import { stopAudio } from "./timeline";
 
 function addTexDiv(){
     const div = document.createElement("div");
@@ -73,13 +22,13 @@ export async function speakAndHighlight(shape : MathEntity, speech : Speech, lin
 
     for(const dep of shape.dependencies()){
         
-        dep.setMode(Mode.depend);
+        dep.setMode(ShapeMode.depend);
 
         await sleep(0.5 * 1000 * shape.interval);
     }
 
 
-    shape.setMode(Mode.target);
+    shape.setMode(ShapeMode.target);
 
     while(lines.length != 0){
         const line = lines.shift()!.trim();
@@ -112,12 +61,12 @@ export async function playLangs(){
 
         setVoiceLanguageCode(code3);
         setCookie("VoiceLanguage", code3);
-        i18n_ts.setTextLanguageCode(code3)
-        i18n_ts.loadTranslationMap();
+        setTextLanguageCode(code3)
+        loadTranslationMap();
 
         setCookie("TextLanguage", code3);
 
-        await plane_ts.playBack(PlayMode.normal);
+        await playBack(PlayMode.normal);
     }
 }
 
@@ -129,11 +78,11 @@ export function stopPlay(){
 }
 
 export async function playAllGraph(){
-    firebase_ts.hideGraph();
+    hideGraph();
 
-    const graph = firebase_ts.getGraph();
+    const graph = getGraph();
 
-    const edge_map = new Map<string, firebase_ts.Edge>();
+    const edge_map = new Map<string, Edge>();
 
     graph.docs.forEach(x => msg(`${x.id}:${x.title}`));
 
@@ -141,17 +90,17 @@ export async function playAllGraph(){
     for(const doc of graph.docs){
         // msg(`graph-doc ${doc.id}:${doc.title}`);
         
-        plane_ts.usedReasons.clear();
+        usedReasons.clear();
 
         await readDoc(doc.id);
 
-        for(const reason of plane_ts.usedReasons){
-            const reason_doc_id = plane_ts.reasonToDoc.get(reason);
+        for(const reason of usedReasons){
+            const reason_doc_id = reasonToDoc.get(reason);
             if(reason_doc_id != undefined){
                 const reason_doc = graph.getDocById(reason_doc_id)!;
                 assert(reason_doc != undefined);
 
-                const edge = new firebase_ts.Edge(reason_doc, doc);
+                const edge = new Edge(reason_doc, doc);
                 edge_map.set(edge.key(), edge);
             }        
         }
@@ -170,16 +119,16 @@ export async function playAllGraph(){
         const dst_doc = graph.getDocById(dst_id)!;
         assert(src_doc != undefined && dst_doc != undefined);
 
-        const edge = new firebase_ts.Edge(src_doc, dst_doc);
+        const edge = new Edge(src_doc, dst_doc);
         edge_map.set(edge.key(), edge);
     }
 
     graph.edgeMap = edge_map;
     graph.makeViz();
 
-    firebase_ts.showGraph();
+    showGraph();
 
-    const eng_texts = i18n_ts.getEngTexts();
+    const eng_texts = getEngTexts();
     if(eng_texts != ""){
 
         msg(`eng-texts:[${eng_texts}]`);
@@ -196,7 +145,7 @@ export async function convert(){
         return;
     }
     
-    for(const doc of firebase_ts.graph.docs){
+    for(const doc of graph.docs){
         await readDoc(doc.id);
         if(theDoc == undefined){
             throw new MyError();
@@ -213,11 +162,11 @@ export async function backup(){
         return;
     }
 
-    firebase_ts.hideGraph();
+    hideGraph();
 
-    const graph = firebase_ts.getGraph();
+    const graph = getGraph();
 
-    const backup = new firebase_ts.BackUp();
+    const backup = new BackUp();
     for(const doc of graph.docs){
         
         await readDoc(doc.id);
@@ -226,7 +175,7 @@ export async function backup(){
             throw new MyError("doc is undefined.");
         }
     
-        const text = plane_ts.getOperationsText();
+        const text = getOperationsText();
 
         await backup.writeBackUp(theDoc.id, theDoc.name, text);
         
@@ -235,19 +184,17 @@ export async function backup(){
 
     backup.commitBackUp();
 
-    firebase_ts.showGraph();
+    showGraph();
 }
 
 export async function playBackUp(){
-    firebase_ts.hideGraph();
+    hideGraph();
 
-    for await(const doc_obj of firebase_ts.getBackUp()){
+    for await(const doc_obj of getBackUp()){
         msg(`play backup:${doc_obj.name}`)
         const data = JSON.parse(doc_obj.text);
         await loadOperationsAndPlay(data);
     }
 
-    firebase_ts.showGraph();
-}
-
+    showGraph();
 }
