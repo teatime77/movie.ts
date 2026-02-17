@@ -1,0 +1,6 @@
+{
+  "name": "@stem/movie",
+  "scripts": {
+    "build": "tsc -b && vite build"
+  }
+}
