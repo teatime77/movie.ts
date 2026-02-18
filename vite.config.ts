@@ -13,7 +13,7 @@ export default defineConfig(
         fileName: 'movie',
         formats: ['es']
       },
-      outDir: '../dist'
+      outDir: '../dist/movie/assets'
     }
   })
 );
