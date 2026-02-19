@@ -19,3 +19,4 @@ public/lib/tsconfig.tsbuildinfo
 public/viz-standalone.js
 dist
 tsconfig.tsbuildinfo
+lib
