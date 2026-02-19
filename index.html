@@ -25,7 +25,18 @@
     <script defer src="https://www.gstatic.com/firebasejs/firebase/init.js?useEmulator=false"></script>
 <!------------------------------------ firebase end   -------------------------------------->
 
-<script type="text/javascript" src="viz-standalone.js"></script>
+<!------------------------------------ katex start   -------------------------------------->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+<!------------------------------------ katex end   -------------------------------------->
+
+<script type="text/javascript" src="../firebase/viz-standalone.js"></script>
 
 <script type="module" src="./ts/movie_event.ts"></script>
 
@@ -119,8 +130,8 @@ img:hover + .tooltip {
 <div id="modal_dlg" class="modal" tabindex="0">
 </div>
 
-<img id="pointer_img" class="pointer" src="lib/plane/img/pointer.png" />
-<img id="pointer_move_img" class="pointer" src="lib/plane/img/pointer_move.png" />
+<img id="pointer_img" class="pointer" src="../plane/images/pointer.png" />
+<img id="pointer_move_img" class="pointer" src="../plane/images/pointer_move.png" />
 <div id="katex-div" style="display: none; width: 1280px;; height: 670px; overflow-y: scroll;" ></div>
 
 <dialog id="lang-texts-dlg">

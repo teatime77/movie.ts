@@ -67,13 +67,13 @@ export async function bodyOnLoad(){
         click : async (ev : MouseEvent)=>{
             if(getPlayMode() == PlayMode.stop){
 
-                playStopButton.setImgUrl(`${urlBase}/lib/plane/img/pause.png`);
+                playStopButton.setImgUrl(`${urlBase}/../plane/images/pause.png`);
 
                 switch(appMode){
                 case AppMode.edit:
                 case AppMode.play:
                     await playBack(PlayMode.normal);
-                    playStopButton.setImgUrl(`${urlBase}/lib/plane/img/play.png`);
+                    playStopButton.setImgUrl(`${urlBase}/../plane/images/play.png`);
                     break;
 
                 case AppMode.lessonPlay:
@@ -102,10 +102,10 @@ export async function bodyOnLoad(){
                     throw new MyError();
                 }
 
-                playStopButton.setImgUrl(`${urlBase}/lib/plane/img/play.png`);
+                playStopButton.setImgUrl(`${urlBase}/../plane/images/play.png`);
             }
         },
-        url    : `${urlBase}/lib/plane/img/play.png`,
+        url    : `${urlBase}/../plane/images/play.png`,
         // position : "static",
         margin : "auto 5px",
         width  : `${button_size}px`,
@@ -120,7 +120,7 @@ export async function bodyOnLoad(){
                 click : async (ev : MouseEvent)=>{
                     showLangDlg(true);
                 },
-                url    : `${urlBase}/lib/plane/img/volume.png`,
+                url    : `${urlBase}/../plane/images/volume.png`,
                 margin : "auto 5px",
                 width  : `${button_size}px`,
                 height : `${button_size}px`,
@@ -130,7 +130,7 @@ export async function bodyOnLoad(){
                 click : async (ev : MouseEvent)=>{
                     showLangDlg(false);
                 },
-                url    : `${urlBase}/lib/plane/img/subtitle.png`,
+                url    : `${urlBase}/../plane/images/subtitle.png`,
                 margin : "auto 5px",
                 width  : `${button_size}px`,
                 height : `${button_size}px`,
@@ -166,8 +166,8 @@ export async function bodyOnLoad(){
 
     await initPlane(plane, root);
     
-    await includeDialog(`${urlBase}/lib/firebase/dialog.html`);
-    await includeDialog(`${urlBase}/lib/movie/dialog.html`);
+    await includeDialog(`${urlBase}/../firebase/dialog.html`);
+    await includeDialog(`${urlBase}/dialog.html`);
 
     // await asyncInitSpeech();
     initSpeech();

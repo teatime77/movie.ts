@@ -621,7 +621,7 @@ export async function playLesson(){
     }
 
     setPlayMode(PlayMode.stop);
-    playStopButton.setImgUrl(`${urlBase}/lib/plane/img/play.png`);
+    playStopButton.setImgUrl(`${urlBase}/../plane/images/play.png`);
     msg("play lesson completes");
 }
 
